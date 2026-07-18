@@ -34,11 +34,6 @@ export default function LandingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F6F8FA] flex flex-col">
-      {/* Navbar Minimal */}
-      <nav className="h-16 flex items-center px-6 lg:px-12 border-b border-[#D0D7DE] bg-white">
-        <div className="flex items-center gap-2">
-          <img src="/LanPya_logo.png" alt="LanPya" className="w-10 h-10 object-contain" />
     <div className="landing-page-container">
       {/* Background Grid */}
       <div
