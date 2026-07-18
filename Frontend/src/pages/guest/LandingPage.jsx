@@ -98,24 +98,20 @@ export default function LandingPage() {
             <Link to="/assessment" className="btn btn-dark">
               စိတ်ဝင်စားတာလေ့လာမယ်
               <svg className="arrow amber-arrow" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
-            </Link>
-          </div>
-        </div>
-        <div className="divider"></div>
-      </header>
+              </header>
 
       {/* Section 1: Feature Cards */}
-      <section className="py-24 relative overflow-hidden bg-[#060608] px-4 sm:px-6">
+      <section className="py-12 relative overflow-hidden bg-[#060608] px-4 sm:px-6">
         {/* Glow Effects */}
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-purple-900/10 blur-[120px] rounded-full pointer-events-none" />
-
+        
         <div className="max-w-6xl mx-auto relative z-10">
           {/* Header */}
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-purple-500/10 text-purple-400 border border-purple-500/20 mb-4 tracking-wider uppercase">
+          <div className="text-center max-w-3xl mx-auto mb-10">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-purple-500/10 text-purple-400 border border-purple-500/20 mb-3 tracking-wider uppercase">
               ✨ Discover Lan Pya
             </span>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight mb-4">
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight mb-3">
               လမ်းပြ (Lan Pya) ဆိုတာ ဘာလဲ။
             </h2>
             <p className="text-base sm:text-lg text-[#a8a3c4] font-normal leading-relaxed">
@@ -124,20 +120,20 @@ export default function LandingPage() {
           </div>
 
           {/* Cards Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Card 1 */}
-            <div className="group relative bg-[#13131a]/60 backdrop-blur-xl border border-white/5 hover:border-purple-500/30 rounded-2xl p-8 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-purple-500/10">
+            <div className="group relative bg-[#13131a]/60 backdrop-blur-xl border border-white/5 hover:border-purple-500/30 rounded-2xl p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-purple-500/10">
               <div className="absolute inset-0 bg-gradient-to-b from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl" />
               <div className="relative z-10">
-                <div className="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center border border-purple-500/20 text-purple-400 mb-6 group-hover:scale-110 group-hover:bg-purple-500/20 group-hover:text-purple-300 transition-all duration-300">
+                <div className="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center border border-purple-500/20 text-purple-400 mb-4 group-hover:scale-105 group-hover:bg-purple-500/20 group-hover:text-purple-300 transition-all duration-300">
                   {/* Target / Sparkles Icon */}
-                  <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <circle cx="12" cy="12" r="10" />
                     <circle cx="12" cy="12" r="6" />
                     <circle cx="12" cy="12" r="2" />
                   </svg>
                 </div>
-                <h3 className="text-xl font-bold text-white mb-3">
+                <h3 className="text-lg font-bold text-white mb-2">
                   AI က ဆွဲပေးမယ့် သင့်အတွက် လမ်းကြောင်း
                 </h3>
                 <p className="text-[#a8a3c4] text-sm leading-relaxed font-normal">
@@ -147,17 +143,17 @@ export default function LandingPage() {
             </div>
 
             {/* Card 2 */}
-            <div className="group relative bg-[#13131a]/60 backdrop-blur-xl border border-white/5 hover:border-purple-500/30 rounded-2xl p-8 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-purple-500/10">
+            <div className="group relative bg-[#13131a]/60 backdrop-blur-xl border border-white/5 hover:border-purple-500/30 rounded-2xl p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-purple-500/10">
               <div className="absolute inset-0 bg-gradient-to-b from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl" />
               <div className="relative z-10">
-                <div className="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center border border-purple-500/20 text-purple-400 mb-6 group-hover:scale-110 group-hover:bg-purple-500/20 group-hover:text-purple-300 transition-all duration-300">
+                <div className="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center border border-purple-500/20 text-purple-400 mb-4 group-hover:scale-105 group-hover:bg-purple-500/20 group-hover:text-purple-300 transition-all duration-300">
                   {/* Curated list / Video play Icon */}
-                  <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <polygon points="23 7 16 12 23 17 23 7" />
                     <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
                   </svg>
                 </div>
-                <h3 className="text-xl font-bold text-white mb-3">
+                <h3 className="text-lg font-bold text-white mb-2">
                   အကောင်းဆုံး သင်ခန်းစာများ
                 </h3>
                 <p className="text-[#a8a3c4] text-sm leading-relaxed font-normal">
@@ -167,12 +163,12 @@ export default function LandingPage() {
             </div>
 
             {/* Card 3 */}
-            <div className="group relative bg-[#13131a]/60 backdrop-blur-xl border border-white/5 hover:border-purple-500/30 rounded-2xl p-8 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-purple-500/10">
+            <div className="group relative bg-[#13131a]/60 backdrop-blur-xl border border-white/5 hover:border-purple-500/30 rounded-2xl p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-purple-500/10">
               <div className="absolute inset-0 bg-gradient-to-b from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl" />
               <div className="relative z-10">
-                <div className="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center border border-purple-500/20 text-purple-400 mb-6 group-hover:scale-110 group-hover:bg-purple-500/20 group-hover:text-purple-300 transition-all duration-300">
+                <div className="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center border border-purple-500/20 text-purple-400 mb-4 group-hover:scale-105 group-hover:bg-purple-500/20 group-hover:text-purple-300 transition-all duration-300">
                   {/* Robot / Handshake Icon */}
-                  <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
                     <path d="M12 2v2" />
                     <path d="M8 5h8" />
@@ -180,7 +176,7 @@ export default function LandingPage() {
                     <circle cx="16" cy="15" r="1" />
                   </svg>
                 </div>
-                <h3 className="text-xl font-bold text-white mb-3">
+                <h3 className="text-lg font-bold text-white mb-2">
                   AI Client နဲ့ လက်တွေ့လေ့ကျင့်မယ်
                 </h3>
                 <p className="text-[#a8a3c4] text-sm leading-relaxed font-normal">
@@ -193,13 +189,13 @@ export default function LandingPage() {
       </section>
 
       {/* Section 2: How It Works */}
-      <section className="py-24 relative overflow-hidden bg-[#060608] px-4 sm:px-6 border-t border-white/5">
+      <section className="py-12 relative overflow-hidden bg-[#060608] px-4 sm:px-6 border-t border-white/5">
         <div className="absolute bottom-1/4 right-1/2 translate-x-1/2 w-[500px] h-[500px] bg-indigo-900/10 blur-[120px] rounded-full pointer-events-none" />
 
         <div className="max-w-6xl mx-auto relative z-10">
           {/* Header */}
-          <div className="text-center max-w-3xl mx-auto mb-20">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 mb-4 tracking-wider uppercase">
+          <div className="text-center max-w-3xl mx-auto mb-12">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 mb-3 tracking-wider uppercase">
               🚀 Simple Process
             </span>
             <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
@@ -208,23 +204,23 @@ export default function LandingPage() {
           </div>
 
           {/* Timeline / Step Layout */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 relative">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
             {/* Connection Line (Desktop) */}
-            <div className="hidden md:block absolute top-[52px] left-[15%] right-[15%] h-[2px] bg-gradient-to-r from-purple-500/30 via-indigo-500/30 to-purple-500/30 -z-0" />
+            <div className="hidden md:block absolute top-[32px] left-[15%] right-[15%] h-[2px] bg-gradient-to-r from-purple-500/30 via-indigo-500/30 to-purple-500/30 -z-0" />
 
             {/* Step 1 */}
             <div className="relative flex flex-col items-center text-center group z-10">
               {/* Step Badge & Icon */}
               <div className="relative">
-                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-600 to-indigo-700 flex items-center justify-center text-white font-bold border-4 border-[#060608] shadow-lg shadow-purple-500/20 group-hover:scale-110 transition-transform duration-300 z-10">
+                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-600 to-indigo-700 flex items-center justify-center text-white font-bold border-4 border-[#060608] shadow-lg shadow-purple-500/20 group-hover:scale-105 transition-transform duration-300 z-10">
                   <span className="text-xl">1</span>
                 </div>
                 <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#a3e635] border-2 border-[#060608] animate-pulse" />
               </div>
 
-              <div className="mt-6 p-6 bg-[#13131a]/40 border border-white/5 rounded-2xl hover:border-purple-500/20 transition-all duration-300 w-full">
+              <div className="mt-4 p-5 bg-[#13131a]/40 border border-white/5 rounded-2xl hover:border-purple-500/20 transition-all duration-300 w-full">
                 <span className="text-xs text-purple-400 font-semibold tracking-wider uppercase block mb-1">Step 01</span>
-                <h3 className="text-lg font-bold text-white mb-3">
+                <h3 className="text-lg font-bold text-white mb-2">
                   အမှန်ကန်ဆုံး လမ်းကြောင်းကို ရှာဖွေပါ <span className="block text-xs text-[#a8a3c4] font-normal mt-1">(Find Your True Path)</span>
                 </h3>
                 <p className="text-[#a8a3c4] text-sm leading-relaxed font-normal">
@@ -237,14 +233,14 @@ export default function LandingPage() {
             <div className="relative flex flex-col items-center text-center group z-10">
               {/* Step Badge & Icon */}
               <div className="relative">
-                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-600 to-indigo-700 flex items-center justify-center text-white font-bold border-4 border-[#060608] shadow-lg shadow-purple-500/20 group-hover:scale-110 transition-transform duration-300 z-10">
+                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-600 to-indigo-700 flex items-center justify-center text-white font-bold border-4 border-[#060608] shadow-lg shadow-purple-500/20 group-hover:scale-105 transition-transform duration-300 z-10">
                   <span className="text-xl">2</span>
                 </div>
               </div>
 
-              <div className="mt-6 p-6 bg-[#13131a]/40 border border-white/5 rounded-2xl hover:border-purple-500/20 transition-all duration-300 w-full">
+              <div className="mt-4 p-5 bg-[#13131a]/40 border border-white/5 rounded-2xl hover:border-purple-500/20 transition-all duration-300 w-full">
                 <span className="text-xs text-purple-400 font-semibold tracking-wider uppercase block mb-1">Step 02</span>
-                <h3 className="text-lg font-bold text-white mb-3">
+                <h3 className="text-lg font-bold text-white mb-2">
                   အာရုံမလွင့်ဘဲ လေ့လာပါ <span className="block text-xs text-[#a8a3c4] font-normal mt-1">(Learn Without Distractions)</span>
                 </h3>
                 <p className="text-[#a8a3c4] text-sm leading-relaxed font-normal">
@@ -257,14 +253,14 @@ export default function LandingPage() {
             <div className="relative flex flex-col items-center text-center group z-10">
               {/* Step Badge & Icon */}
               <div className="relative">
-                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-600 to-indigo-700 flex items-center justify-center text-white font-bold border-4 border-[#060608] shadow-lg shadow-purple-500/20 group-hover:scale-110 transition-transform duration-300 z-10">
+                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-600 to-indigo-700 flex items-center justify-center text-white font-bold border-4 border-[#060608] shadow-lg shadow-purple-500/20 group-hover:scale-105 transition-transform duration-300 z-10">
                   <span className="text-xl">3</span>
                 </div>
               </div>
 
-              <div className="mt-6 p-6 bg-[#13131a]/40 border border-white/5 rounded-2xl hover:border-purple-500/20 transition-all duration-300 w-full">
+              <div className="mt-4 p-5 bg-[#13131a]/40 border border-white/5 rounded-2xl hover:border-purple-500/20 transition-all duration-300 w-full">
                 <span className="text-xs text-purple-400 font-semibold tracking-wider uppercase block mb-1">Step 03</span>
-                <h3 className="text-lg font-bold text-white mb-3">
+                <h3 className="text-lg font-bold text-white mb-2">
                   လက်တွေ့စွမ်းရည်ကို သက်သေပြပါ <span className="block text-xs text-[#a8a3c4] font-normal mt-1">(Prove Your Skills)</span>
                 </h3>
                 <p className="text-[#a8a3c4] text-sm leading-relaxed font-normal">
@@ -303,14 +299,14 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-[#0b0b10] border-t border-white/5 py-16 px-4 sm:px-6 relative overflow-hidden">
+      <footer className="bg-[#0b0b10] border-t border-white/5 py-10 px-4 sm:px-6 relative overflow-hidden">
         {/* Ambient Glow */}
         <div className="absolute bottom-0 right-0 w-[300px] h-[300px] bg-purple-900/10 blur-[100px] rounded-full pointer-events-none" />
 
         <div className="max-w-6xl mx-auto relative z-10">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
             {/* Col 1: About */}
-            <div className="space-y-4">
+            <div className="space-y-3">
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8">
                   <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -344,7 +340,7 @@ export default function LandingPage() {
             {/* Col 3: Contact */}
             <div>
               <h3 className="text-sm font-semibold text-white tracking-wider uppercase mb-4">Contact</h3>
-              <ul className="space-y-3">
+              <ul className="space-y-2">
                 <li className="flex items-center gap-2 text-sm text-[#a8a3c4]">
                   <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-purple-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <rect x="2" y="4" width="20" height="16" rx="2" />
@@ -374,12 +370,8 @@ export default function LandingPage() {
           </div>
 
           {/* Bottom Copyright & Footer Info */}
-          <div className="pt-8 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="pt-6 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4">
             <p className="text-xs text-[#a8a3c4]">&copy; 2026 Lan Pya. All rights reserved.</p>
-            <div className="flex gap-4">
-              <a href="#" className="text-xs text-[#a8a3c4] hover:text-purple-400 transition-colors">Terms of Service</a>
-              <a href="#" className="text-xs text-[#a8a3c4] hover:text-purple-400 transition-colors">Privacy Policy</a>
-            </div>
           </div>
         </div>
       </footer>
