@@ -1,13 +1,12 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import * as THREE from 'three';
 import './LandingPage.css';
 
-// Import assets from your src/assets folder
+// Import assets from your frontend/assets folder
+import bgImg from '../../../assets/BG.png';
 import mascotImg from '../../../assets/mascot.png';
 import roadmapImg from '../../../assets/roadmap.png';
 import ytImg from '../../../assets/yt.png';
-import bgImg from '../../../assets/BG.png';
 
 const categories = [
   "Technology & Programming",
@@ -23,124 +22,7 @@ const categories = [
 ];
 
 export default function LandingPage() {
-  const containerRef = useRef(null);
   const [activeAccordion, setActiveAccordion] = useState(null);
-
-  useEffect(() => {
-    if (!containerRef.current) return;
-    
-    const container = containerRef.current;
-    let width = container.clientWidth || 600;
-    let height = container.clientHeight || 400;
-
-    const scene = new THREE.Scene();
-    
-    // Camera setup
-    const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
-    camera.position.z = 5;
-
-    // Renderer setup
-    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-    renderer.setSize(width, height);
-    renderer.setPixelRatio(window.devicePixelRatio);
-    container.appendChild(renderer.domElement);
-
-    // Load Textures
-    const textureLoader = new THREE.TextureLoader();
-    const mascotTex = textureLoader.load(mascotImg);
-    const roadmapTex = textureLoader.load(roadmapImg);
-    const ytTex = textureLoader.load(ytImg);
-
-    // Materials
-    const materialParams = { transparent: true, side: THREE.DoubleSide };
-    const mascotMat = new THREE.MeshBasicMaterial({ map: mascotTex, ...materialParams });
-    const roadmapMat = new THREE.MeshBasicMaterial({ map: roadmapTex, ...materialParams });
-    const ytMat = new THREE.MeshBasicMaterial({ map: ytTex, ...materialParams });
-
-    // Geometries
-    const mascotGeo = new THREE.PlaneGeometry(5.5, 5.5);
-    const ytGeo = new THREE.PlaneGeometry(1.2, 1.2);
-    const roadmapGeo = new THREE.PlaneGeometry(1.6, 1.6);
-
-    // Meshes
-    const mascot = new THREE.Mesh(mascotGeo, mascotMat);
-    const roadmapIcon = new THREE.Mesh(roadmapGeo, roadmapMat);
-    const ytIcon = new THREE.Mesh(ytGeo, ytMat);
-
-    // Initial positions (yt on left, roadmap on right)
-    ytIcon.position.set(-1.8, 0.9, 0.5);
-    ytIcon.rotation.z = -0.2; // Adjust tilt to make it straighter
-    roadmapIcon.position.set(1.8, -0.1, 0.5);
-
-    scene.add(mascot);
-    scene.add(roadmapIcon);
-    scene.add(ytIcon);
-
-    // Mouse Parallax
-    let mouseX = 0;
-    let mouseY = 0;
-    let targetX = 0;
-    let targetY = 0;
-
-    const windowHalfX = window.innerWidth / 2;
-    const windowHalfY = window.innerHeight / 2;
-
-    const onMouseMove = (event) => {
-      mouseX = (event.clientX - windowHalfX) * 0.001;
-      mouseY = (event.clientY - windowHalfY) * 0.001;
-    };
-    document.addEventListener('mousemove', onMouseMove);
-
-    // Animation Loop
-    const clock = new THREE.Clock();
-    let animationFrameId;
-
-    const animate = () => {
-      animationFrameId = requestAnimationFrame(animate);
-      const time = clock.getElapsedTime();
-
-      // Floating
-      mascot.position.y = 0.4 + Math.sin(time * 2) * 0.1;
-      mascot.rotation.z = Math.sin(time * 1.5) * 0.05;
-
-      // Orbiting near hands
-      ytIcon.position.y = 0.9 + Math.sin(time * 2.5) * 0.15;
-      ytIcon.position.x = -1.8 + Math.sin(time * 1) * 0.05;
-      
-      roadmapIcon.position.y = -0.1 + Math.cos(time * 2.2) * 0.15;
-      roadmapIcon.position.x = 1.8 + Math.cos(time * 1.2) * 0.05;
-
-      // Parallax Tilt
-      targetX = mouseX * 0.5;
-      targetY = mouseY * 0.5;
-
-      scene.rotation.y += 0.05 * (targetX - scene.rotation.y);
-      scene.rotation.x += 0.05 * (targetY - scene.rotation.x);
-
-      renderer.render(scene, camera);
-    };
-
-    animate();
-
-    // Handle Resize
-    const onResize = () => {
-      width = container.clientWidth || 600;
-      height = container.clientHeight || 400;
-      renderer.setSize(width, height);
-      camera.aspect = width / height;
-      camera.updateProjectionMatrix();
-    };
-    window.addEventListener('resize', onResize);
-
-    return () => {
-      document.removeEventListener('mousemove', onMouseMove);
-      window.removeEventListener('resize', onResize);
-      cancelAnimationFrame(animationFrameId);
-      if (container.contains(renderer.domElement)) {
-        container.removeChild(renderer.domElement);
-      }
-    };
-  }, []);
 
   const handleMockSignup = (e) => {
     e.stopPropagation();
@@ -154,9 +36,9 @@ export default function LandingPage() {
   return (
     <div className="landing-page-container">
       {/* Background Grid */}
-      <div 
-        className="bg-grid" 
-        style={{ backgroundImage: `url(${bgImg})` }} 
+      <div
+        className="bg-grid"
+        style={{ backgroundImage: `url(${bgImg})` }}
       />
 
       {/* Navbar */}
@@ -165,7 +47,7 @@ export default function LandingPage() {
           <div className="nav-left">
             <div className="logo-icon">
               <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" fill="url(#violet-grad)" stroke="url(#violet-grad)" strokeWidth="2" strokeLinejoin="round"/>
+                <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" fill="url(#violet-grad)" stroke="url(#violet-grad)" strokeWidth="2" strokeLinejoin="round" />
                 <defs>
                   <linearGradient id="violet-grad" x1="3" y1="2" x2="21" y2="22" gradientUnits="userSpaceOnUse">
                     <stop stopColor="#9333ea" />
@@ -176,7 +58,7 @@ export default function LandingPage() {
             </div>
             <span className="wordmark">လမ်းပြ</span>
           </div>
-          
+
           <div className="nav-center">
             <a href="#">Home</a>
             <a href="#">Courses</a>
@@ -188,7 +70,7 @@ export default function LandingPage() {
             <Link to="/login" className="nav-login">Log in</Link>
             <Link to="/assessment" className="btn btn-primary">Start Learning</Link>
           </div>
-          
+
           <button className="hamburger" aria-label="Menu">
             <span></span><span></span><span></span>
           </button>
@@ -200,19 +82,22 @@ export default function LandingPage() {
         <div className="hero-content">
           <h1>We're Here To Help</h1>
           <p className="subheading">AI-Powered Digital Learning</p>
-          
-          <div className="mascot-area" ref={containerRef}>
-            {/* Three.js Canvas injected here */}
+
+          {/* Static Hero Image (Robot + Icons) */}
+          <div className="hero-image-wrapper">
+            <img src={mascotImg} alt="LanPya Robot Mascot" className="hero-static-img" />
+            <img src={ytImg} alt="Youtube Icon" className="hero-icon-yt" />
+            <img src={roadmapImg} alt="Roadmap Icon" className="hero-icon-roadmap" />
           </div>
-          
+
           <div className="hero-ctas">
             <Link to="/assessment" className="btn btn-dark">
-              ဝါသနာကို ရှာဖွေပါ 
-              <svg className="arrow lime-arrow" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              ဝါသနာကို ရှာဖွေပါ
+              <svg className="arrow lime-arrow" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
             </Link>
             <Link to="/assessment" className="btn btn-dark">
               စိတ်ဝင်စားတာလေ့လာမယ်
-              <svg className="arrow amber-arrow" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              <svg className="arrow amber-arrow" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
             </Link>
           </div>
         </div>
@@ -224,7 +109,7 @@ export default function LandingPage() {
         <div className="explore-header">
           <div className="eyebrow">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" fill="url(#violet-grad-small)" stroke="url(#violet-grad-small)"/>
+              <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" fill="url(#violet-grad-small)" stroke="url(#violet-grad-small)" />
               <defs>
                 <linearGradient id="violet-grad-small" x1="3" y1="2" x2="21" y2="22" gradientUnits="userSpaceOnUse">
                   <stop stopColor="#9333ea" />
@@ -240,7 +125,7 @@ export default function LandingPage() {
           </p>
           <Link to="/assessment" className="btn btn-primary explore-cta">
             ဝါသနာကို ရှာဖွေပါ
-            <svg className="arrow white-arrow" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            <svg className="arrow white-arrow" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
           </Link>
         </div>
 
@@ -250,7 +135,7 @@ export default function LandingPage() {
             const isActive = activeAccordion === index;
             return (
               <div key={index} className={`accordion-item ${isActive ? 'active' : ''}`}>
-                <button 
+                <button
                   className="accordion-header"
                   aria-expanded={isActive}
                   onClick={() => toggleAccordion(index)}
@@ -258,18 +143,18 @@ export default function LandingPage() {
                   <div className="accordion-header-left">
                     <div className="accordion-icon">
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
                       </svg>
                     </div>
                     <span className="accordion-title">{index + 1}. {cat}</span>
                   </div>
                   <svg className="accordion-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M6 9l6 6 6-6"/>
+                    <path d="M6 9l6 6 6-6" />
                   </svg>
                 </button>
-                
-                <div 
-                  className="accordion-content" 
+
+                <div
+                  className="accordion-content"
                   style={{ maxHeight: isActive ? '1000px' : '0' }}
                 >
                   <div className="accordion-inner">
