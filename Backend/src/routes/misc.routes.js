@@ -25,6 +25,9 @@ router.post("/announcements", protect, authorize("admin"), misc.createAnnounceme
 // Search
 router.get("/search", misc.search);
 
+// Guest AI Assessment (Public)
+router.post("/guest-assessment", misc.generateGuestAssessment);
+
 // AI Recommendations
 router.get("/recommendations", protect, misc.getAiRecommendations);
 

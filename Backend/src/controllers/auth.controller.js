@@ -22,7 +22,8 @@ exports.register = asyncHandler(async (req, res) => {
 // @route   POST /api/v1/auth/login
 exports.login = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
-  const { user, accessToken, refreshToken } = await authService.loginUser({ email, password });
+  const normalizedEmail = email ? email.trim().toLowerCase() : email;
+  const { user, accessToken, refreshToken } = await authService.loginUser({ email: normalizedEmail, password });
   res.status(200).json(ApiResponse.success({ user, accessToken, refreshToken }, "Login successful"));
 });
 

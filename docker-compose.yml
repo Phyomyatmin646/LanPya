@@ -17,7 +17,9 @@ services:
       target: ${BUILD_TARGET:-development} # dev or production
     restart: unless-stopped
     ports:
-      - "${BACKEND_PORT:-5000}:5000"
+      - "${BACKEND_PORT:-5001}:5000"
+    env_file:
+      - .env
     environment:
       NODE_ENV: ${NODE_ENV:-development}
       PORT: 5000
@@ -61,10 +63,11 @@ services:
     restart: unless-stopped
     ports:
       - "${FRONTEND_PORT:-3000}:3000"
+    env_file:
+      - .env
     environment:
       NODE_ENV: ${NODE_ENV:-development}
-      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:5000/api/v1}
-      NEXT_PUBLIC_GEMINI_API_KEY: ${GEMINI_API_KEY}
+      VITE_API_URL: ${VITE_API_URL:-http://localhost:5001/api/v1}
     volumes:
       - ./Frontend:/app
       - /app/node_modules

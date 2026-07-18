@@ -31,7 +31,12 @@ exports.registerUser = async ({ full_name, username, email, password, role_id })
  * Login user with email and password
  */
 exports.loginUser = async ({ email, password }) => {
+  console.log("=== LOGIN DEBUG ===");
+  console.log("Attempting login for email:", email);
+  
   const user = await User.findOne({ email }).select("+password_hash").populate("role_id");
+  console.log("User found in DB?", !!user);
+  
   if (!user) {
     const err = new Error("Invalid email or password");
     err.statusCode = 401;
@@ -39,6 +44,8 @@ exports.loginUser = async ({ email, password }) => {
   }
 
   const isMatch = await user.comparePassword(password);
+  console.log("Password match?", isMatch);
+  
   if (!isMatch) {
     const err = new Error("Invalid email or password");
     err.statusCode = 401;
