@@ -9,6 +9,69 @@ import { toast } from 'react-hot-toast';
 import ChatComponent from '../chat/ChatComponent';
 import { useAuth } from '../../hooks/useAuth';
 
+// ── Helpers ───────────────────────────────────────────────────
+function getEmbedUrl(url) {
+  if (!url) return null;
+  // YouTube
+  const ytMatch = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([\w-]{11})/);
+  if (ytMatch) return `https://www.youtube.com/embed/${ytMatch[1]}?rel=0&modestbranding=1`;
+  // Vimeo
+  const vmMatch = url.match(/vimeo\.com\/(\d+)/);
+  if (vmMatch) return `https://player.vimeo.com/video/${vmMatch[1]}`;
+  return null; // raw video url — use <video> tag
+}
+
+function VideoPlayer({ resource, user, onSignupPrompt }) {
+  if (!user) {
+    return (
+      <div className="relative rounded-xl overflow-hidden bg-[#0B1120] aspect-video flex items-center justify-center mb-8 border border-[#1f2937]">
+        <div className="absolute inset-0 bg-gradient-to-br from-[#0B1120] to-[#1a2340] opacity-90" />
+        <div className="relative z-10 text-center px-6">
+          <div className="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center mx-auto mb-4">
+            <Lock className="w-8 h-8 text-white/60" />
+          </div>
+          <h3 className="text-white font-bold text-lg mb-2">Video locked for guests</h3>
+          <p className="text-gray-400 text-sm mb-4">Create a free account to watch this lesson video.</p>
+          <button
+            onClick={onSignupPrompt}
+            className="bg-[#0969DA] hover:bg-blue-500 text-white font-semibold text-sm px-6 py-2.5 rounded-full transition-colors"
+          >
+            Sign up to watch
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const embedUrl = getEmbedUrl(resource.url);
+
+  if (embedUrl) {
+    return (
+      <div className="rounded-xl overflow-hidden aspect-video mb-8 border border-[#D0D7DE] shadow-sm">
+        <iframe
+          src={embedUrl}
+          title={resource.title || 'Lesson Video'}
+          className="w-full h-full"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+        />
+      </div>
+    );
+  }
+
+  // Raw video file
+  return (
+    <div className="rounded-xl overflow-hidden mb-8 border border-[#D0D7DE] shadow-sm bg-black">
+      <video
+        src={resource.url}
+        controls
+        className="w-full max-h-[480px]"
+        title={resource.title || 'Lesson Video'}
+      />
+    </div>
+  );
+}
+
 export default function LessonViewPage() {
   const { id, lessonId } = useParams();
   const queryClient = useQueryClient();
@@ -162,21 +225,45 @@ export default function LessonViewPage() {
               </div>
             </div>
 
+            {/* Video Section — shown before markdown if any video resource exists */}
+            {(() => {
+              const videoResource = resources.find(r => r.type === 'video');
+              if (!videoResource) return null;
+              return (
+                <div className="mb-6">
+                  <h3 className="text-base font-semibold text-[#24292F] mb-3 flex items-center gap-2">
+                    <PlayCircle className="w-5 h-5 text-accent" /> Video Lesson
+                  </h3>
+                  <VideoPlayer
+                    resource={videoResource}
+                    user={user}
+                    onSignupPrompt={() => handleRestrictedAction('watch videos')}
+                  />
+                </div>
+              );
+            })()}
+
             {/* Markdown Body */}
             <div className="prose prose-sm sm:prose-base max-w-none text-[#24292F] prose-headings:font-semibold prose-a:text-[#0969DA] prose-pre:bg-[#F6F8FA] prose-pre:border prose-pre:border-[#D0D7DE] prose-pre:text-[#24292F]">
               <div dangerouslySetInnerHTML={{ __html: lesson.content || '<p>No text content available.</p>' }} />
             </div>
 
-            {/* Resources Section */}
+            {/* Resources Section — show non-video resources or all if no video resource */}
             {resources.length > 0 && (
               <div className="mt-12 pt-6 border-t border-[#D0D7DE]">
                 <h3 className="text-lg font-semibold text-[#24292F] mb-4">Resources</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {resources.map(res => (
-                    <a 
-                      key={res._id} 
-                      href={res.url} 
-                      target="_blank" 
+                  {resources
+                    .filter(res => {
+                      // If there's a video resource that's already shown in the player, hide it here
+                      const primaryVideo = resources.find(r => r.type === 'video');
+                      return !(primaryVideo && res._id === primaryVideo._id);
+                    })
+                    .map(res => (
+                    <a
+                      key={res._id}
+                      href={res.url}
+                      target="_blank"
                       rel="noopener noreferrer"
                       className="gh-box p-3 flex items-center gap-3 hover:border-accent transition-colors group"
                     >

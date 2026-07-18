@@ -13,7 +13,10 @@ export const announcementService = {
 };
 
 export const miscService = {
-  search:             (q)     => api.get('/search', { params: { q } }),
-  getRecommendations: ()      => api.get('/recommendations'),
-  guestAssessment:    (data)  => api.post('/guest-assessment', data),
+  search:                 (q)         => api.get('/search', { params: { q } }),
+  getRecommendations:     ()          => api.get('/recommendations'),
+  guestAssessment:        (data)      => api.post('/guest-assessment', data),
+  getTrendingRoadmaps:    (limit = 6) => api.get('/trending-roadmaps', { params: { limit } }),
+  getLeaderboard:         (limit = 10)=> api.get('/leaderboard', { params: { limit } }),
+  getGuestRecommendations:(interests, limit = 6) => api.get('/guest-recommendations', { params: { interests: interests.join(','), limit } }),
 };

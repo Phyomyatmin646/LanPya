@@ -8,11 +8,10 @@ export default function DashboardLayout() {
       
       <div className="flex flex-1 overflow-hidden relative">
         <main className="flex-1 overflow-y-auto w-full relative z-10">
-          <div className="max-w-7xl mx-auto w-full">
-            <Outlet />
-          </div>
+          <Outlet />
         </main>
       </div>
+
     </div>
   );
 }

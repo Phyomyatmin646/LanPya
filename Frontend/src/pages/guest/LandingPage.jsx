@@ -6,14 +6,8 @@ export default function LandingPage() {
     <div className="min-h-screen bg-[#F6F8FA] flex flex-col">
       {/* Navbar Minimal */}
       <nav className="h-16 flex items-center px-6 lg:px-12 border-b border-[#D0D7DE] bg-white">
-        <div className="flex items-center gap-2 font-bold text-xl text-[#24292F]">
-          <div className="w-8 h-8 rounded-full bg-[#24292F] text-white flex items-center justify-center">L</div>
-          LanPya
-        </div>
-        <div className="ml-auto flex gap-4">
-          <Link to="/login" className="text-sm font-medium text-[#24292F] hover:text-accent flex items-center">
-            Sign in
-          </Link>
+        <div className="flex items-center gap-2">
+          <img src="/LanPya_logo.png" alt="LanPya" className="w-10 h-10 object-contain" />
         </div>
       </nav>
 

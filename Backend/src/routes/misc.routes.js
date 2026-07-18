@@ -28,6 +28,11 @@ router.get("/search", misc.search);
 // Guest AI Assessment (Public)
 router.post("/guest-assessment", misc.generateGuestAssessment);
 
+// Public discovery routes (no auth required)
+router.get("/trending-roadmaps", misc.getTrendingRoadmaps);
+router.get("/leaderboard", misc.getLeaderboard);
+router.get("/guest-recommendations", misc.getGuestRecommendations);
+
 // AI Recommendations
 router.get("/recommendations", protect, misc.getAiRecommendations);
 
