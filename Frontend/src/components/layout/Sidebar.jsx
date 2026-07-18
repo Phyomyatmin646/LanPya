@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Home, Compass, BookOpen, Settings, LayoutDashboard, Database, Users, ShieldAlert } from 'lucide-react';
+import { Home, Compass, BookOpen, Settings, LayoutDashboard, Database, Users, ShieldAlert, Bot } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 
 export function Sidebar({ isOpen, toggleSidebar }) {
@@ -10,6 +10,7 @@ export function Sidebar({ isOpen, toggleSidebar }) {
     { label: 'Dashboard', icon: Home, path: '/dashboard' },
     { label: 'Explore', icon: Compass, path: '/explore' },
     { label: 'My Learning', icon: BookOpen, path: '/learning' },
+    { label: 'LanPya AI', icon: Bot, path: '/chat' },
     { label: 'Settings', icon: Settings, path: '/settings' },
   ];
 

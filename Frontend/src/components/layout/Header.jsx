@@ -34,6 +34,9 @@ export function Header({ toggleSidebar }) {
             <Link to="/dashboard" className="px-3 py-1.5 rounded-md hover:bg-white/10 transition-colors">Dashboard</Link>
             <Link to="/explore" className="px-3 py-1.5 rounded-md hover:bg-white/10 transition-colors">Explore</Link>
             <Link to="/learning" className="px-3 py-1.5 rounded-md hover:bg-white/10 transition-colors">My Learning</Link>
+            <Link to="/chat" className="px-3 py-1.5 rounded-md hover:bg-white/10 transition-colors flex items-center gap-1">
+              LanPya AI
+            </Link>
             {user.role?.name === 'admin' && (
               <Link to="/admin" className="px-3 py-1.5 rounded-md text-accent hover:bg-white/10 transition-colors">Admin</Link>
             )}

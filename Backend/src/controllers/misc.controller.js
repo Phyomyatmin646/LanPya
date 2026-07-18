@@ -91,43 +91,68 @@ exports.getAiRecommendations = asyncHandler(async (req, res) => {
 });
 
 exports.generateGuestAssessment = asyncHandler(async (req, res) => {
-  const { goal, currentLevel, interests } = req.body;
+  const { topTracks } = req.body;
   
-  const prompt = `You are an expert technical learning advisor. A user has provided their learning profile:
-  Goal: ${goal}
-  Current Level: ${currentLevel}
-  Interests: ${interests.join(", ")}
-  
-  Generate a personalized learning roadmap summary for this user. Output ONLY valid JSON in the following format:
+  // 1. RAG Context: Fetch available public roadmaps from the database
+  const availableRoadmaps = await Roadmap.find({ is_public: true })
+    .select("title description difficulty")
+    .limit(20)
+    .lean();
+    
+  const dbContext = availableRoadmaps.length > 0 
+    ? `Available platform roadmaps for reference:\n${availableRoadmaps.map(r => `- ${r.title}: ${r.description} (${r.difficulty})`).join("\n")}`
+    : "No existing roadmaps available yet. Generate generic ones.";
+
+  const systemInstruction = `You are an expert technical learning advisor for the LanPya platform.
+Your task is to recommend exactly 5 learning roadmaps based on the user's top tracked interests and the platform's available roadmaps.
+The first roadmap should be the absolute best match (Top choice), and the remaining 4 should be optional alternative paths.
+
+Output ONLY valid JSON containing an array of exactly 5 roadmap objects.
+Format:
+[
   {
-    "title": "A catchy title for their roadmap (e.g., Full Stack Master)",
-    "description": "A short, encouraging 2-sentence description of what they will achieve.",
-    "modules": [
-      { "title": "Module 1 Name", "description": "Short desc" },
-      { "title": "Module 2 Name", "description": "Short desc" }
-    ]
-  }
-  Do not include markdown blocks or any other text. Return raw JSON.`;
+    "title": "Roadmap Title",
+    "description": "Short description of the path",
+    "modules": [ "Module 1", "Module 2", "Module 3", "Module 4", "Module 5" ],
+    "isTopMatch": true // ONLY true for the first one
+  },
+  ...
+]`;
 
-  const aiResponse = await aiService.chatWithAI(prompt);
+  const prompt = `User's Top Tracks/Interests: ${topTracks.join(", ")}
   
-  let roadmapData;
+${dbContext}
+
+Please generate the 5 roadmaps array now.`;
+
+  let roadmapsArray = [];
   try {
+    const aiResponse = await aiService.generateStructuredData(prompt, systemInstruction);
+    
+    // Sometimes local models still wrap in markdown despite format: "json"
     const cleanJsonStr = aiResponse.replace(/```json|```/g, "").trim();
-    roadmapData = JSON.parse(cleanJsonStr);
+    roadmapsArray = JSON.parse(cleanJsonStr);
+    
+    // Ensure it's an array of 5
+    if (!Array.isArray(roadmapsArray)) roadmapsArray = [roadmapsArray];
+    if (roadmapsArray.length > 5) roadmapsArray = roadmapsArray.slice(0, 5);
   } catch (e) {
-    // Fallback if parsing fails
-    roadmapData = {
-      title: "Custom Learning Path",
-      description: "Based on your answers, we've crafted a unique path for you to achieve your goals.",
-      modules: [
-        { title: "Fundamentals", description: "Core concepts based on your level." },
-        { title: "Advanced Topics", description: "Diving deeper into your interests." }
-      ]
-    };
+    // Fallback if local AI fails or parsing fails
+    roadmapsArray = [
+      {
+        title: `${topTracks[0] || "Custom"} Master Path`,
+        description: "Your personalized top recommendation based on your quiz.",
+        modules: ["Basics", "Intermediate Concepts", "Advanced Projects"],
+        isTopMatch: true
+      },
+      { title: "Alternative Path 1", description: "Optional path", modules: ["Concept 1", "Concept 2"], isTopMatch: false },
+      { title: "Alternative Path 2", description: "Optional path", modules: ["Concept 1", "Concept 2"], isTopMatch: false },
+      { title: "Alternative Path 3", description: "Optional path", modules: ["Concept 1", "Concept 2"], isTopMatch: false },
+      { title: "Alternative Path 4", description: "Optional path", modules: ["Concept 1", "Concept 2"], isTopMatch: false }
+    ];
   }
 
-  res.status(200).json(ApiResponse.success({ roadmap: roadmapData }, "Guest roadmap generated successfully"));
+  res.status(200).json(ApiResponse.success({ roadmaps: roadmapsArray }, "Guest roadmaps generated successfully"));
 });
 
 // ── Trending Roadmaps (public) ────────────────────────────────
