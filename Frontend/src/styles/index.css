@@ -1,3 +1,14 @@
+/* ── Myanmar Font ─────────────────────────────────────────────── */
+@font-face {
+  font-family: 'Irrawaddy';
+  src: url('/assets/fonts/Z14-Irrawaddy.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+1000-109F;
+}
+
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -6,9 +17,9 @@
   :root {
     --background: 0 0% 100%;
     --foreground: 210 11% 15%;
-    
+
     --border: 210 18% 87%;
-    
+
     --muted: 210 20% 98%;
     --muted-foreground: 210 11% 40%;
   }
@@ -18,12 +29,18 @@
   }
 
   /* Typography */
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     @apply font-semibold tracking-tight;
   }
 }
 
 @layer components {
+
   /* Layout utilities */
   .container-gh {
     @apply max-w-[1216px] mx-auto px-4 sm:px-6;
@@ -33,7 +50,7 @@
   .gh-border {
     @apply border border-[#D0D7DE];
   }
-  
+
   .gh-box {
     @apply bg-white gh-border rounded-md shadow-sm;
   }
@@ -41,7 +58,7 @@
   .gh-box-header {
     @apply px-4 py-3 bg-[#F6F8FA] border-b border-[#D0D7DE] rounded-t-md font-semibold text-sm;
   }
-  
+
   .gh-box-body {
     @apply p-4;
   }
@@ -50,6 +67,7 @@
   .gh-input {
     @apply w-full px-3 py-1.5 text-sm bg-[#F6F8FA] border border-[#D0D7DE] rounded-md shadow-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition-colors;
   }
+
   .gh-label {
     @apply block text-sm font-semibold mb-1;
   }
@@ -58,18 +76,23 @@
   .btn {
     @apply inline-flex items-center justify-center px-3 py-1.5 text-sm font-medium rounded-md shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed;
   }
+
   .btn-default {
     @apply bg-[#F6F8FA] text-[#24292F] border border-[#d0d7de] hover:bg-[#F3F4F6] hover:border-[#8c959f] focus:ring-gray-200;
   }
+
   .btn-primary {
     @apply bg-[#2DA44E] text-white border border-[#2DA44E] hover:bg-[#2C974B] focus:ring-green-400;
   }
+
   .btn-brand {
     @apply bg-primary text-white border border-primary hover:bg-primary-hover focus:ring-primary/40;
   }
+
   .btn-danger {
     @apply bg-[#F6F8FA] text-[#CF222E] border border-[#d0d7de] hover:bg-[#A40E26] hover:text-white hover:border-[#A40E26] focus:ring-red-400;
   }
+
   .btn-ghost {
     @apply bg-transparent text-[#57606A] border border-transparent shadow-none hover:text-[#24292F] hover:bg-[#F3F4F6];
   }
@@ -78,6 +101,7 @@
   .gh-link {
     @apply text-accent hover:underline font-medium;
   }
+
   .gh-link-muted {
     @apply text-[#57606A] hover:text-accent transition-colors;
   }
@@ -88,12 +112,15 @@
   width: 10px;
   height: 10px;
 }
+
 ::-webkit-scrollbar-track {
   background: transparent;
 }
+
 ::-webkit-scrollbar-thumb {
   @apply bg-[#d0d7de] rounded-full border-2 border-transparent bg-clip-padding;
 }
+
 ::-webkit-scrollbar-thumb:hover {
   @apply bg-[#8c959f];
 }

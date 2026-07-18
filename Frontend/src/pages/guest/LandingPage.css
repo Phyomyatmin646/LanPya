@@ -21,7 +21,7 @@
 }
 
 .landing-page-container {
-  font-family: 'Poppins', 'Noto Sans Myanmar', sans-serif;
+  font-family: 'Irrawaddy', 'Poppins', 'Noto Sans Myanmar', sans-serif;
   background-color: var(--bg-page);
   color: var(--text-main);
   line-height: 1.5;
@@ -111,7 +111,7 @@
 
 .nav-center a {
   font-size: 16px;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Irrawaddy', 'Inter', sans-serif;
   color: #d1d5db;
   transition: color 0.2s;
 }
@@ -242,7 +242,7 @@
   color: var(--text-muted);
   margin-bottom: var(--spacing-4);
   /* Reduced margin */
-  font-family: 'Inter', sans-serif;
+  font-family: 'Irrawaddy', 'Inter', sans-serif;
 }
 
 .hero-image-wrapper {
@@ -339,7 +339,7 @@
 .explore-desc {
   font-size: 16px;
   color: var(--text-muted);
-  font-family: 'Inter', sans-serif;
+  font-family: 'Irrawaddy', 'Inter', sans-serif;
   max-width: 600px;
   margin: 0 auto var(--spacing-6);
 }
@@ -430,7 +430,7 @@
   padding: 6px 12px;
   border-radius: var(--border-pill);
   font-size: 14px;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Irrawaddy', 'Inter', sans-serif;
 }
 
 .video-grid {
@@ -488,7 +488,7 @@
 
 .video-content p {
   font-size: 12px;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Irrawaddy', 'Inter', sans-serif;
 }
 
 .btn-unlock {

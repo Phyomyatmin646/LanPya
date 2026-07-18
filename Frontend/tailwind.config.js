@@ -25,6 +25,7 @@ export default {
       },
       fontFamily: {
         sans: [
+          'Irrawaddy',
           '-apple-system',
           'BlinkMacSystemFont',
           '"Segoe UI"',
