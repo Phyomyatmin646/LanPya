@@ -19,6 +19,16 @@ const LessonResource = require('./src/models/lessonResource.model');
 const User         = require('./src/models/user.model');
 const Role         = require('./src/models/role.model');
 
+// ── Thumbnails Mapping ──────────────────────────────────────────────
+const ROADMAP_THUMBNAILS = {
+  "basic photoshop": "/courses/adobe photoshop.png",
+  "typography": "/courses/typography.png",
+  "color theory": "/courses/color theory.png",
+  "adobe illustrator": "/courses/adobe illustrator.png",
+  "branding": "/courses/branding.png",
+  "cv & portfolio building": "/courses/portfolio.png"
+};
+
 // ── Skills Data ─────────────────────────────────────────────────────
 const SKILLS_DATA = [
   { category: "Foundation Skills",     name: "Computer Basics" },
@@ -287,6 +297,41 @@ const COURSES_DATA = [
       { title: "ဒီ video ကြည့်ပြီး တာ Social Media Design တွင် ကိုကျွမ်းကျင်ဆန်ဆိုပြီး Photoshop Tutorial", youtubeUrl: "https://www.youtube.com/watch?v=BPIkuoAm3C8" },
     ]
   },
+  {
+    title: "Typography",
+    skillName: "Typography",
+    lessons: [
+      { title: "Typography ဆိုတာဘာလဲ? Typeface နဲ့ Font ကွာခြားချက်", youtubeUrl: "https://www.youtube.com/watch?v=sByzHoiYFX0" }
+    ]
+  },
+  {
+    title: "Color Theory",
+    skillName: "Color Theory",
+    lessons: [
+      { title: "Color Theory အခြေခံ နှင့် Design တွင် အရောင်အသုံးပြုနည်း", youtubeUrl: "https://www.youtube.com/watch?v=GyVMK5n-R-c" }
+    ]
+  },
+  {
+    title: "Adobe Illustrator",
+    skillName: "Adobe Illustrator",
+    lessons: [
+      { title: "Adobe Illustrator CC အခြေခံ အသုံးပြုနည်း သင်ခန်းစာ ၁", youtubeUrl: "https://www.youtube.com/watch?v=7_pM4tDq3l0" }
+    ]
+  },
+  {
+    title: "Branding",
+    skillName: "Branding",
+    lessons: [
+      { title: "Branding ဆိုတာဘာလဲ? Brand Identity တည်ဆောက်ခြင်း", youtubeUrl: "https://www.youtube.com/watch?v=1rLVounBiOM" }
+    ]
+  },
+  {
+    title: "CV & Portfolio Building",
+    skillName: "CV & Portfolio Building",
+    lessons: [
+      { title: "Professional CV Form နှင့် Portfolio တည်ဆောက်နည်း", youtubeUrl: "https://www.youtube.com/watch?v=m9f8H8_oXuI" }
+    ]
+  },
 ];
 
 // ── Category icon map ────────────────────────────────────────────────
@@ -391,6 +436,7 @@ async function seed() {
 
       // Roadmap: one per skill (upsert-style)
       let roadmap = await Roadmap.findOne({ title: normSkill });
+      const currentThumb = ROADMAP_THUMBNAILS[normSkill.toLowerCase()] || "";
       if (!roadmap) {
         roadmap = await Roadmap.create({
           category_id,
@@ -398,14 +444,16 @@ async function seed() {
           title: normSkill,
           description: `${normSkill} လေ့လာရန် လမ်းညွှန် (Roadmap)`,
           difficulty: 'beginner',
+          thumbnail: currentThumb,
           is_public: true,
         });
         console.log(`  + Roadmap: ${normSkill}`);
       } else {
         // Update description for existing ones to remove the Burmese template text
         roadmap.description = `${normSkill} လေ့လာရန် လမ်းညွှန် (Roadmap)`;
+        roadmap.thumbnail = currentThumb;
         await roadmap.save();
-        console.log(`  ~ Roadmap exists and updated description: ${normSkill}`);
+        console.log(`  ~ Roadmap exists and updated description/thumbnail: ${normSkill}`);
       }
 
       // Module: one per course title (group of lessons)
