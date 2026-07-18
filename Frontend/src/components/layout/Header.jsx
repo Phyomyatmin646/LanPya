@@ -15,7 +15,7 @@ export function Header({ toggleSidebar }) {
   };
 
   return (
-    <header className="sticky top-0 z-40 w-full bg-[#24292F] text-white shadow-sm h-16 flex items-center px-4 justify-between">
+    <header className="sticky top-0 z-40 w-full bg-[#0b0715] border-b border-white/10 text-white shadow-sm h-[76px] flex items-center px-5 lg:px-8 justify-between">
       <div className="flex items-center gap-4 flex-1">
         <button onClick={toggleSidebar} className="md:hidden text-[#8C959F] hover:text-white transition-colors">
           <Menu className="w-6 h-6" />
@@ -25,15 +25,15 @@ export function Header({ toggleSidebar }) {
           <img
             src="/LanPya_logo.png"
             alt="LanPya Logo"
-            className="w-10 h-10 object-contain"
+            className="w-11 h-11 object-contain"
           />
         </Link>
 
         {user && (
           <nav className="hidden lg:flex items-center gap-1 ml-4 text-sm font-medium">
-            <Link to="/dashboard" className="px-3 py-1.5 rounded-md hover:bg-white/10 transition-colors">Dashboard</Link>
-            <Link to="/explore" className="px-3 py-1.5 rounded-md hover:bg-white/10 transition-colors">Explore</Link>
-            <Link to="/learning" className="px-3 py-1.5 rounded-md hover:bg-white/10 transition-colors">My Learning</Link>
+            <Link to="/dashboard" className="px-3 py-1.5 rounded-lg hover:bg-white/10 transition-colors">Dashboard</Link>
+            <Link to="/explore" className="px-3 py-1.5 rounded-lg hover:bg-white/10 transition-colors">Explore</Link>
+            <Link to="/learning" className="px-3 py-1.5 rounded-lg hover:bg-white/10 transition-colors">My Learning</Link>
             {user.role?.name === 'admin' && (
               <Link to="/admin" className="px-3 py-1.5 rounded-md text-accent hover:bg-white/10 transition-colors">Admin</Link>
             )}

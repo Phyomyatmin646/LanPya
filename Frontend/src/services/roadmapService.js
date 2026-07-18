@@ -3,6 +3,8 @@ import api from '@/api/axios';
 export const roadmapService = {
   getAll:   (params)       => api.get('/roadmaps', { params }),
   getById:  (id)           => api.get(`/roadmaps/${id}`),
+  getFullRoadmap: (id)     => api.get(`/roadmaps/${id}/full`),
+  getCategoriesWithRoadmaps: () => api.get('/roadmaps/categories-with-roadmaps'),
   create:   (data)         => api.post('/roadmaps', data),
   update:   (id, data)     => api.put(`/roadmaps/${id}`, data),
   remove:   (id)           => api.delete(`/roadmaps/${id}`),

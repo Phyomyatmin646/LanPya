@@ -1,215 +1,357 @@
-import { useParams, Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { roadmapService } from '../../services/roadmapService';
-import { BookOpen, Star, FileText, CheckCircle2, Circle, Users, Info } from 'lucide-react';
+import {
+  PlayCircle, CheckCircle2, ChevronLeft, ChevronRight,
+  List, Share2, ThumbsUp, Clock, BookOpen, Users,
+  Lock, MessageSquare, Check, ChevronDown, ChevronUp,
+  Shuffle, RotateCcw, MoreVertical, Play
+} from 'lucide-react';
 import { Skeleton } from '../../components/ui/Skeleton';
-import { Badge } from '../../components/ui/Badge';
 import { toast } from 'react-hot-toast';
 import { useAuth } from '../../hooks/useAuth';
 
+// ── YouTube URL → embed URL ────────────────────────────────────
+function getEmbedUrl(url) {
+  if (!url) return null;
+  const ytMatch = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([\w-]{11})/);
+  if (ytMatch) {
+    const params = new URLSearchParams({
+      rel: '0',
+      modestbranding: '1',
+      autoplay: '0',
+    });
+    return `https://www.youtube.com/embed/${ytMatch[1]}?${params}`;
+  }
+  return null;
+}
+
+function getYoutubeThumbnail(url) {
+  if (!url) return null;
+  const ytMatch = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([\w-]{11})/);
+  if (ytMatch) return `https://i.ytimg.com/vi/${ytMatch[1]}/mqdefault.jpg`;
+  return null;
+}
+
+// ── Difficulty badge ──────────────────────────────────────────
+const DIFF = {
+  beginner:     { label: 'Beginner',     cls: 'bg-blue-500/20 text-blue-400 border-blue-500/30' },
+  intermediate: { label: 'Intermediate', cls: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' },
+  advanced:     { label: 'Advanced',     cls: 'bg-rose-500/20 text-rose-400 border-rose-500/30' },
+};
+
 export default function RoadmapDetailPage() {
   const { id } = useParams();
-  const queryClient = useQueryClient();
   const { user } = useAuth();
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
+  const [activeLesson, setActiveLesson] = useState(null); // { lesson, resource }
+  const [expandedModules, setExpandedModules] = useState({});
+
+  // Use our full roadmap endpoint that includes modules + lessons + resources
   const { data: roadmapResponse, isLoading } = useQuery({
-    queryKey: ['roadmap', id],
-    queryFn: () => roadmapService.getById(id),
+    queryKey: ['roadmap-full', id],
+    queryFn: () => roadmapService.getFullRoadmap(id),
   });
 
-  const { data: modulesResponse, isLoading: modulesLoading } = useQuery({
-    queryKey: ['roadmap', id, 'modules'],
-    queryFn: () => roadmapService.getModules(id),
-  });
+  const roadmap = roadmapResponse?.data?.data;
+  const modules = roadmap?.modules || [];
 
-  const enrollMutation = useMutation({
-    mutationFn: () => roadmapService.enroll(id),
-    onSuccess: () => {
-      toast.success('Successfully enrolled!');
-      queryClient.invalidateQueries(['roadmap', id]);
-    },
-    onError: (error) => {
-      toast.error(error.response?.data?.message || 'Failed to enroll');
+  // Flatten all lessons for prev/next navigation
+  const allLessons = modules.flatMap(mod =>
+    (mod.lessons || []).map(lesson => ({
+      lesson,
+      module: mod,
+      resource: lesson.resources?.find(r => r.type === 'video') || null,
+    }))
+  );
+
+  // Auto-select first lesson with a video
+  useEffect(() => {
+    if (allLessons.length > 0 && !activeLesson) {
+      const first = allLessons.find(l => l.resource) || allLessons[0];
+      setActiveLesson(first);
+      // Expand first module by default
+      if (modules[0]) setExpandedModules({ [modules[0]._id]: true });
     }
-  });
+  }, [modules.length, allLessons, activeLesson, modules]);
+
+  const activeIndex = activeLesson
+    ? allLessons.findIndex(l => l.lesson._id === activeLesson.lesson._id)
+    : -1;
+
+  const goTo = (idx) => {
+    if (idx >= 0 && idx < allLessons.length) {
+      setActiveLesson(allLessons[idx]);
+      // Expand the module this lesson belongs to
+      setExpandedModules(prev => ({ ...prev, [allLessons[idx].module._id]: true }));
+    }
+  };
+
+  const toggleModule = (modId) => {
+    setExpandedModules(prev => ({ ...prev, [modId]: !prev[modId] }));
+  };
+
+  const totalLessons = allLessons.length;
+  const totalModules = modules.length;
+  const diff = DIFF[roadmap?.difficulty] || DIFF.beginner;
 
   if (isLoading) {
     return (
-      <div className="container-gh py-8 space-y-6">
-        <Skeleton className="h-8 w-1/3" />
-        <Skeleton className="h-4 w-1/2" />
-        <Skeleton className="h-32 w-full" />
+      <div className="min-h-screen bg-[#0f0f0f] p-6">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <div className="lg:col-span-2 space-y-3">
+            <Skeleton className="aspect-video w-full rounded-xl bg-white/5" />
+            <Skeleton className="h-6 w-2/3 bg-white/5" />
+            <Skeleton className="h-4 w-1/2 bg-white/5" />
+          </div>
+          <div className="space-y-2">
+            {[...Array(6)].map((_, i) => <Skeleton key={i} className="h-16 w-full rounded-lg bg-white/5" />)}
+          </div>
+        </div>
       </div>
     );
   }
 
-  const roadmap = roadmapResponse?.data?.data;
-  const modules = modulesResponse?.data?.data || [];
-  const isEnrolled = roadmap?.isEnrolled;
+  if (!roadmap) {
+    return (
+      <div className="min-h-screen bg-[#0f0f0f] flex items-center justify-center">
+        <p className="text-white/50">Roadmap not found.</p>
+      </div>
+    );
+  }
+
+  const embedUrl = activeLesson?.resource ? getEmbedUrl(activeLesson.resource.url) : null;
 
   return (
-    <div className="bg-[#F6F8FA] min-h-screen">
-      {/* Repository Header */}
-      <div className="bg-white border-b border-[#D0D7DE] pt-6 pb-0">
-        <div className="container-gh">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
-            <div className="flex items-center gap-2">
-              <BookOpen className="w-5 h-5 text-[#57606A]" />
-              <h1 className="text-xl font-semibold text-[#0969DA] hover:underline cursor-pointer">
-                {roadmap.title}
-              </h1>
-              <Badge variant="default" className="ml-2">Public</Badge>
-            </div>
-            
-            <div className="flex items-center gap-2">
-              <button className="btn btn-default text-xs py-1 px-2 h-7 gap-1">
-                <Star className="w-4 h-4" /> Star
-                <span className="bg-[#F3F4F6] px-1.5 py-0.5 rounded-full ml-1 text-xs border border-[#D0D7DE]">
-                  {roadmap.ratings?.average || 0}
-                </span>
-              </button>
-              
-              {!isEnrolled ? (
-                <button 
-                  onClick={() => {
-                    if (!user) {
-                      toast((t) => (
-                        <div className="flex flex-col gap-2">
-                          <span className="font-semibold text-sm">Create a free account to enroll</span>
-                          <Link to="/register" onClick={() => toast.dismiss(t.id)} className="bg-accent text-white px-2 py-1 rounded text-xs text-center mt-1 w-full">Sign up now</Link>
-                        </div>
-                      ), { duration: 4000, icon: '🔒' });
-                      return;
-                    }
-                    enrollMutation.mutate();
-                  }}
-                  disabled={enrollMutation.isPending}
-                  className="btn btn-primary text-xs py-1 px-3 h-7"
-                >
-                  {enrollMutation.isPending ? 'Enrolling...' : 'Enroll'}
-                </button>
+    <div className="min-h-screen bg-[#0f0f0f] text-white">
+      <div className="max-w-[1600px] mx-auto px-3 py-4">
+
+        {/* Back button */}
+        <Link
+          to="/dashboard"
+          className="inline-flex items-center gap-1.5 text-sm text-white/50 hover:text-white transition-colors mb-4"
+        >
+          <ChevronLeft className="w-4 h-4" /> Back to Dashboard
+        </Link>
+
+        <div className="flex flex-col lg:flex-row gap-4">
+
+          {/* ── LEFT: Video Player + Info ─────────────────────── */}
+          <div className="flex-1 min-w-0">
+
+            {/* Video Player */}
+            <div className="relative bg-black rounded-xl overflow-hidden aspect-video w-full shadow-2xl">
+              {embedUrl ? (
+                <iframe
+                  key={activeLesson?.lesson._id}
+                  src={embedUrl}
+                  title={activeLesson?.lesson?.title || 'Lesson Video'}
+                  className="w-full h-full"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                />
               ) : (
-                <button className="btn btn-default text-xs py-1 px-3 h-7 text-[#1A7F37] border-[#1A7F37] bg-[#E5F6EB]">
-                  Enrolled
-                </button>
+                <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-[#1a1a2e] to-[#16213e]">
+                  <div className="w-20 h-20 rounded-full bg-white/10 flex items-center justify-center mb-4">
+                    <Play className="w-10 h-10 text-white/60 ml-1" />
+                  </div>
+                  <p className="text-white/50 text-sm">
+                    {activeLesson ? 'No video for this lesson' : 'Select a lesson to start'}
+                  </p>
+                </div>
               )}
             </div>
-          </div>
-          
-          {/* Navigation Tabs */}
-          <nav className="flex gap-4 border-b-0 overflow-x-auto">
-            <button className="flex items-center gap-2 py-2 px-1 border-b-2 border-[#FD8C73] font-semibold text-[#24292F] text-sm">
-              <FileText className="w-4 h-4" /> Content
-            </button>
-            <button className="flex items-center gap-2 py-2 px-1 border-b-2 border-transparent font-medium text-[#57606A] hover:text-[#24292F] hover:border-[#D0D7DE] text-sm">
-              <Users className="w-4 h-4" /> Discussions
-            </button>
-            <button className="flex items-center gap-2 py-2 px-1 border-b-2 border-transparent font-medium text-[#57606A] hover:text-[#24292F] hover:border-[#D0D7DE] text-sm">
-              <Info className="w-4 h-4" /> Insights
-            </button>
-          </nav>
-        </div>
-      </div>
 
-      <div className="container-gh py-6">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
-          
-          {/* Main Content (File Explorer Style) */}
-          <div className="md:col-span-8 lg:col-span-9 space-y-6">
-            <div className="gh-box">
-              <div className="gh-box-header flex items-center justify-between">
-                <span>Curriculum Modules</span>
-                <span className="font-normal text-[#57606A]">{modules.length} modules</span>
+            {/* Video info bar */}
+            <div className="mt-3 flex items-center justify-between gap-2">
+              <button
+                onClick={() => goTo(activeIndex - 1)}
+                disabled={activeIndex <= 0}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed text-sm transition-colors"
+              >
+                <ChevronLeft className="w-4 h-4" /> Previous
+              </button>
+              <span className="text-xs text-white/40">
+                {activeIndex >= 0 ? `${activeIndex + 1} / ${totalLessons}` : ''}
+              </span>
+              <button
+                onClick={() => goTo(activeIndex + 1)}
+                disabled={activeIndex >= totalLessons - 1}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed text-sm transition-colors"
+              >
+                Next <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Lesson title & meta */}
+            <div className="mt-4">
+              <h1 className="text-xl font-semibold text-white leading-snug">
+                {activeLesson?.lesson?.title || roadmap.title}
+              </h1>
+              {activeLesson?.lesson?.description && (
+                <p className="text-sm text-white/50 mt-1">{activeLesson.lesson.description}</p>
+              )}
+            </div>
+
+            {/* Roadmap info card */}
+            <div className="mt-5 bg-[#1a1a1a] border border-white/10 rounded-2xl p-5">
+              <div className="flex items-start gap-4">
+                <div className="flex-1 min-w-0">
+                  <div className="flex flex-wrap items-center gap-2 mb-2">
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${diff.cls}`}>
+                      {diff.label}
+                    </span>
+                    {roadmap.category_id && (
+                      <span className="text-[10px] text-white/40 bg-white/5 px-2 py-0.5 rounded-full">
+                        {roadmap.category_id.icon} {roadmap.category_id.name}
+                      </span>
+                    )}
+                  </div>
+                  <h2 className="text-base font-bold text-white mb-1">{roadmap.title}</h2>
+                  <p className="text-sm text-white/50 leading-relaxed">{roadmap.description}</p>
+
+                  <div className="flex flex-wrap gap-4 mt-4 text-xs text-white/50">
+                    <div className="flex items-center gap-1.5">
+                      <BookOpen className="w-3.5 h-3.5" />
+                      <span>{totalModules} module{totalModules !== 1 ? 's' : ''}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <PlayCircle className="w-3.5 h-3.5" />
+                      <span>{totalLessons} lessons</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <Users className="w-3.5 h-3.5" />
+                      <span>{roadmap.enrollment_count || 0} enrolled</span>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div className="p-0">
-                {modulesLoading ? (
-                  <div className="p-4"><Skeleton className="h-10 w-full" /></div>
-                ) : modules.length === 0 ? (
-                  <div className="p-8 text-center text-[#57606A]">No modules published yet.</div>
+            </div>
+          </div>
+
+          {/* ── RIGHT: Playlist Panel ─────────────────────────── */}
+          <div className="w-full lg:w-[400px] shrink-0">
+            {/* Playlist header */}
+            <div className="bg-[#1a1a1a] border border-white/10 rounded-2xl overflow-hidden flex flex-col h-[calc(100vh-100px)]">
+              <div className="px-4 py-4 border-b border-white/10">
+                <h3 className="font-semibold text-lg text-white mb-1">{roadmap.title}</h3>
+                <div className="flex items-center justify-between mt-2">
+                  <p className="text-xs text-white/50">
+                    {roadmap.created_by?.full_name} • {activeIndex >= 0 ? `${activeIndex + 1}` : '0'} / {totalLessons}
+                  </p>
+                  <div className="flex items-center gap-1">
+                    <button className="p-1.5 rounded-lg hover:bg-white/10 text-white/50 hover:text-white transition-colors">
+                      <Shuffle className="w-4 h-4" />
+                    </button>
+                    <button className="p-1.5 rounded-lg hover:bg-white/10 text-white/50 hover:text-white transition-colors">
+                      <RotateCcw className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Module + Lesson list */}
+              <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+                {modules.length === 0 ? (
+                  <p className="text-white/30 text-sm text-center py-8">No lessons yet.</p>
                 ) : (
-                  <ul className="divide-y divide-[#D0D7DE]">
-                    {modules.map(module => (
-                      <li key={module._id} className="hover:bg-[#F6F8FA] transition-colors">
-                        <div className="p-4 flex items-start gap-3">
-                          <div className="mt-1">
-                            {isEnrolled && module.is_completed ? (
-                              <CheckCircle2 className="w-5 h-5 text-[#1A7F37]" />
-                            ) : (
-                              <Circle className="w-5 h-5 text-[#D0D7DE]" />
-                            )}
+                  modules.map((mod, modIdx) => {
+                    const isExpanded = expandedModules[mod._id] !== false; // default expanded
+                    const lessons = mod.lessons || [];
+
+                    return (
+                      <div key={mod._id} className="border-b border-white/5 last:border-0">
+                        {/* Module header */}
+                        <button
+                          onClick={() => toggleModule(mod._id)}
+                          className="w-full flex items-center justify-between px-4 py-3 hover:bg-white/5 transition-colors text-left"
+                        >
+                          <div className="flex-1 min-w-0 pr-4">
+                            <p className="text-sm font-semibold text-white/90 truncate">
+                              Section {modIdx + 1}: {mod.title}
+                            </p>
                           </div>
-                          <div className="flex-1">
-                            <h3 className="font-semibold text-[#24292F] text-sm">
-                              {module.title}
-                            </h3>
-                            <p className="text-[#57606A] text-sm mt-1">{module.description}</p>
-                            
-                            {/* Lessons List - if we have them in the response */}
-                            {module.lessons && module.lessons.length > 0 && (
-                              <div className="mt-3 bg-white border border-[#D0D7DE] rounded-md overflow-hidden">
-                                {module.lessons.map((lesson, idx) => (
-                                  <Link 
-                                    key={lesson._id}
-                                    to={isEnrolled ? `/roadmaps/${id}/learn/${lesson._id}` : '#'}
-                                    className={`flex items-center gap-2 p-2 text-sm ${idx !== module.lessons.length - 1 ? 'border-b border-[#D0D7DE]' : ''} hover:bg-[#F3F4F6] transition-colors ${!isEnrolled ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                    onClick={(e) => {
-                                      if (!isEnrolled) {
-                                        e.preventDefault();
-                                        toast('Please enroll to view lessons', { icon: 'ℹ️' });
-                                      }
-                                    }}
-                                  >
-                                    <FileText className="w-4 h-4 text-[#57606A]" />
-                                    <span className="text-[#0969DA] hover:underline">{lesson.title}</span>
-                                  </Link>
-                                ))}
-                              </div>
-                            )}
+                          {isExpanded
+                            ? <ChevronUp className="w-4 h-4 text-white/40 shrink-0" />
+                            : <ChevronDown className="w-4 h-4 text-white/40 shrink-0" />
+                          }
+                        </button>
+
+                        {/* Lessons */}
+                        {isExpanded && (
+                          <div className="pb-2">
+                            {lessons.map((lesson, lessonIdx) => {
+                              const videoResource = lesson.resources?.find(r => r.type === 'video');
+                              const thumb = videoResource ? getYoutubeThumbnail(videoResource.url) : null;
+                              const isActive = activeLesson?.lesson._id === lesson._id;
+                              const globalIdx = allLessons.findIndex(l => l.lesson._id === lesson._id);
+
+                              return (
+                                <button
+                                  key={lesson._id}
+                                  onClick={() => setActiveLesson({ lesson, module: mod, resource: videoResource || null })}
+                                  className={`w-full flex items-start gap-3 px-3 py-2 text-left transition-colors group relative
+                                    ${isActive
+                                      ? 'bg-white/10'
+                                      : 'hover:bg-white/5'
+                                    }`}
+                                >
+                                  {/* Playing Indicator */}
+                                  <div className="w-4 flex justify-center shrink-0 mt-3">
+                                    {isActive ? (
+                                      <Play className="w-3 h-3 text-white" fill="currentColor" />
+                                    ) : (
+                                      <span className="text-[10px] text-white/40 group-hover:hidden">{globalIdx + 1}</span>
+                                    )}
+                                    {!isActive && <Play className="w-3 h-3 text-white hidden group-hover:block" fill="currentColor" />}
+                                  </div>
+
+                                  {/* Thumbnail */}
+                                  <div className="relative shrink-0 w-[120px] h-[68px] rounded-lg overflow-hidden bg-black/50">
+                                    {thumb ? (
+                                      <img
+                                        src={thumb}
+                                        alt={lesson.title}
+                                        className="w-full h-full object-cover"
+                                        loading="lazy"
+                                      />
+                                    ) : (
+                                      <div className="w-full h-full flex items-center justify-center bg-white/5">
+                                        <BookOpen className="w-5 h-5 text-white/30" />
+                                      </div>
+                                    )}
+                                    {/* Estimated Time Overlay */}
+                                    {lesson.estimated_minutes > 0 && (
+                                      <div className="absolute bottom-1 right-1 bg-black/80 text-white text-[10px] px-1 py-0.5 rounded font-medium">
+                                        {lesson.estimated_minutes}:00
+                                      </div>
+                                    )}
+                                  </div>
+
+                                  {/* Lesson info */}
+                                  <div className="flex-1 min-w-0 flex flex-col justify-center h-[68px]">
+                                    <p className="text-[13px] leading-snug line-clamp-2 font-medium text-white/90">
+                                      {lesson.title}
+                                    </p>
+                                    <p className="text-[11px] text-white/50 mt-1">
+                                      {roadmap.created_by?.full_name}
+                                    </p>
+                                  </div>
+                                </button>
+                              );
+                            })}
                           </div>
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
+                        )}
+                      </div>
+                    );
+                  })
                 )}
               </div>
             </div>
-            
-            {/* README equivalent */}
-            <div className="gh-box">
-              <div className="gh-box-header flex items-center gap-2">
-                <BookOpen className="w-4 h-4" /> README.md
-              </div>
-              <div className="gh-box-body prose prose-sm max-w-none text-[#24292F]">
-                <h2>About this Roadmap</h2>
-                <p>{roadmap.description}</p>
-              </div>
-            </div>
           </div>
-
-          {/* Right Sidebar (About) */}
-          <div className="md:col-span-4 lg:col-span-3 space-y-6">
-            <div>
-              <h3 className="text-sm font-semibold text-[#24292F] mb-3">About</h3>
-              <p className="text-sm text-[#57606A] mb-4">{roadmap.description}</p>
-              
-              <div className="space-y-2 text-sm text-[#57606A]">
-                <div className="flex items-center gap-2">
-                  <Star className="w-4 h-4" />
-                  <strong>{roadmap.ratings?.average || 0}</strong> stars
-                </div>
-                <div className="flex items-center gap-2">
-                  <Users className="w-4 h-4" />
-                  <strong>{roadmap.enrollment_count || 0}</strong> enrolled
-                </div>
-              </div>
-            </div>
-            
-            <div className="border-t border-[#D0D7DE] pt-4">
-              <h3 className="text-sm font-semibold text-[#24292F] mb-3">Category</h3>
-              <Badge variant="primary">{roadmap.category?.name || 'Uncategorized'}</Badge>
-            </div>
-          </div>
-          
         </div>
       </div>
     </div>
