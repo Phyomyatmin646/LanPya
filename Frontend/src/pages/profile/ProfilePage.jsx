@@ -1,6 +1,6 @@
 import { useAuth } from '../../hooks/useAuth';
 import { useQuery } from '@tanstack/react-query';
-import { progressService } from '../../services/progressService';
+import { enrollmentService } from '../../services/enrollmentService';
 import { Avatar } from '../../components/ui/Avatar';
 import { Users, MapPin, Link as LinkIcon, BookOpen, Star, Activity } from 'lucide-react';
 import { Skeleton } from '../../components/ui/Skeleton';
@@ -11,7 +11,7 @@ export default function ProfilePage() {
   
   const { data: progressResponse, isLoading } = useQuery({
     queryKey: ['progress'],
-    queryFn: () => progressService.getMyProgress(),
+    queryFn: () => enrollmentService.getMyEnrollments(),
   });
 
   const enrolledRoadmaps = progressResponse?.data?.data || [];
@@ -70,28 +70,31 @@ export default function ProfilePage() {
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {enrolledRoadmaps.slice(0, 4).map(prog => (
-                  <div key={prog._id} className="gh-box p-4 flex flex-col h-full">
-                    <div className="flex items-center gap-2 mb-2">
-                      <BookOpen className="w-4 h-4 text-[#57606A]" />
-                      <Link to={`/roadmaps/${prog.roadmap._id}`} className="font-semibold text-[#0969DA] hover:underline truncate">
-                        {prog.roadmap.title}
-                      </Link>
+                {enrolledRoadmaps.slice(0, 4).map(prog => {
+                  const rm = prog.roadmap_id || prog.roadmap;
+                  return (
+                    <div key={prog._id} className="gh-box p-4 flex flex-col h-full">
+                      <div className="flex items-center gap-2 mb-2">
+                        <BookOpen className="w-4 h-4 text-[#57606A]" />
+                        <Link to={`/roadmaps/${rm?._id}`} className="font-semibold text-[#0969DA] hover:underline truncate">
+                          {rm?.title || 'Roadmap'}
+                        </Link>
+                      </div>
+                      <p className="text-xs text-[#57606A] mb-4 flex-1 line-clamp-2">
+                        {rm?.description || 'No description available.'}
+                      </p>
+                      <div className="flex items-center gap-3 text-xs text-[#57606A]">
+                        <span className="flex items-center gap-1">
+                          <span className="w-2 h-2 rounded-full bg-accent"></span>
+                          {Math.round(prog.progress || prog.progress_percentage || 0)}%
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Star className="w-3 h-3" /> {rm?.ratings?.average || 0}
+                        </span>
+                      </div>
                     </div>
-                    <p className="text-xs text-[#57606A] mb-4 flex-1 line-clamp-2">
-                      {prog.roadmap.description}
-                    </p>
-                    <div className="flex items-center gap-3 text-xs text-[#57606A]">
-                      <span className="flex items-center gap-1">
-                        <span className="w-2 h-2 rounded-full bg-accent"></span>
-                        {Math.round(prog.progress_percentage || 0)}%
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Star className="w-3 h-3" /> {prog.roadmap.ratings?.average || 0}
-                      </span>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>

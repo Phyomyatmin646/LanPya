@@ -45,7 +45,7 @@ const AdminRag          = lazy(() => import('@/pages/admin/RagManagementPage'));
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <Toaster position="top-center" />
       <Suspense fallback={<PageLoader />}>
         <Routes>
