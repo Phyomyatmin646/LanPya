@@ -1,8 +1,45 @@
 /* ── Myanmar Font ─────────────────────────────────────────────── */
 @font-face {
-  font-family: 'Irrawaddy';
-  src: url('/assets/fonts/Z14-Irrawaddy.ttf') format('truetype');
+  font-family: 'Walone';
+  src: url('/fonts/Z06-Walone Regular.ttf') format('truetype');
   font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+1000-109F;
+}
+
+@font-face {
+  font-family: 'Walone';
+  src: url('/fonts/Z06-Walone Bold.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+1000-109F;
+}
+
+@font-face {
+  font-family: 'Walone';
+  src: url('/fonts/Z06-Walone Thin.ttf') format('truetype');
+  font-weight: 100;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+1000-109F;
+}
+
+/* Alias Irrawaddy to Walone to ensure compatibility with existing styles */
+@font-face {
+  font-family: 'Irrawaddy';
+  src: url('/fonts/Z06-Walone Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+1000-109F;
+}
+
+@font-face {
+  font-family: 'Irrawaddy';
+  src: url('/fonts/Z06-Walone Bold.ttf') format('truetype');
+  font-weight: bold;
   font-style: normal;
   font-display: swap;
   unicode-range: U+1000-109F;
