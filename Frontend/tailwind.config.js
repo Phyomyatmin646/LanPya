@@ -25,6 +25,7 @@ export default {
       },
       fontFamily: {
         sans: [
+          'Walone',
           'Irrawaddy',
           '-apple-system',
           'BlinkMacSystemFont',
