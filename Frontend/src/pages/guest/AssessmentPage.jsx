@@ -155,22 +155,13 @@ const roadmaps = {
 };
 
 export default function AssessmentPage() {
-  const [step, setStep] = useState('quiz'); // 'quiz', 'results'
+  const [step, setStep] = useState('quiz'); // 'quiz', 'loading', 'results'
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [scores, setScores] = useState({});
-  const [primaryMatch, setPrimaryMatch] = useState('');
-  const [secondaryMatch, setSecondaryMatch] = useState('');
-  const [hasSavedResult, setHasSavedResult] = useState(false);
-
+  const [aiRoadmaps, setAiRoadmaps] = useState([]);
+  
   // Random sorting options for current question
   const [shuffledOptions, setShuffledOptions] = useState([]);
-
-  useEffect(() => {
-    const saved = localStorage.getItem('skillPathResult');
-    if (saved) {
-      setHasSavedResult(true);
-    }
-  }, []);
 
   useEffect(() => {
     if (step === 'quiz') {
@@ -183,22 +174,40 @@ export default function AssessmentPage() {
     setStep('quiz');
     setCurrentQuestion(0);
     setScores({});
+    setAiRoadmaps([]);
   };
 
-  const handleResume = () => {
-    const savedStr = localStorage.getItem('skillPathResult');
-    if (savedStr) {
-      try {
-        const saved = JSON.parse(savedStr);
-        setPrimaryMatch(saved.primary);
-        setSecondaryMatch(saved.secondary);
-        setStep('results');
-      } catch (e) {
-        handleStart();
+  const fetchAiRoadmaps = async (topTracks) => {
+    setStep('loading');
+    try {
+      // In a real app, you'd use your configured axios instance
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001/api/v1';
+      const response = await fetch(`${apiUrl}/guest-assessment`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ topTracks })
+      });
+      
+      const data = await response.json();
+      if (data.success && data.data && data.data.roadmaps) {
+        setAiRoadmaps(data.data.roadmaps);
+      } else {
+        throw new Error("Invalid response format");
       }
-    } else {
-      handleStart();
+    } catch (error) {
+      console.error("Failed to fetch AI roadmaps:", error);
+      toast.error("Failed to generate AI roadmaps. Using fallback.");
+      // Fallback
+      setAiRoadmaps([{
+        title: `${topTracks[0]} Master Path`,
+        description: "Your personalized top recommendation.",
+        modules: ["Basics", "Intermediate", "Advanced"],
+        isTopMatch: true
+      }]);
     }
+    setStep('results');
   };
 
   const handleOptionSelect = (track) => {
@@ -210,22 +219,18 @@ export default function AssessmentPage() {
         setCurrentQuestion(prev => prev + 1);
       } else {
         const sortedTracks = Object.keys(newScores).sort((a, b) => newScores[b] - newScores[a]);
-        const primary = sortedTracks[0] || "Programming";
-        const secondary = sortedTracks.length > 1 ? sortedTracks[1] : null;
-
-        setPrimaryMatch(primary);
-        setSecondaryMatch(secondary);
-        localStorage.setItem('skillPathResult', JSON.stringify({ primary, secondary }));
-        setStep('results');
+        const topTracks = sortedTracks.slice(0, 3); // Send top 3 tracks to AI
+        fetchAiRoadmaps(topTracks);
       }
     }, 300);
   };
 
   const shareResult = () => {
-    const text = `I just took the Hackathon 2026 Skill Path Finder! My top track is ${primaryMatch}. Find your passion too!`;
+    const topMatch = aiRoadmaps[0]?.title || "Custom Path";
+    const text = `I just took the AI Skill Path Finder! My top recommended track is ${topMatch}. Find your passion too!`;
     if (navigator.share) {
       navigator.share({
-        title: 'My Skill Path',
+        title: 'My AI Skill Path',
         text: text,
         url: window.location.href,
       }).catch(console.error);
@@ -247,7 +252,7 @@ export default function AssessmentPage() {
       {step === 'quiz' && (
         <div className="flex-1 flex flex-col items-center justify-center p-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
           <div className="w-full max-w-2xl mb-12">
-            <div className="text-right text-[#8a8d9b] text-sm mb-2">Question {currentQuestion + 1} of 15</div>
+            <div className="text-right text-[#8a8d9b] text-sm mb-2">Question {currentQuestion + 1} of {questions.length}</div>
             <div className="w-full bg-white/10 h-2 rounded-full overflow-hidden">
               <div
                 className="h-full bg-gradient-to-r from-[#00f0ff] to-[#b026ff] transition-all duration-300"
@@ -274,24 +279,32 @@ export default function AssessmentPage() {
         </div>
       )}
 
+      {/* Loading Screen */}
+      {step === 'loading' && (
+        <div className="flex-1 flex flex-col items-center justify-center p-6 animate-in fade-in duration-500">
+          <RefreshCw className="w-12 h-12 text-[#00f0ff] animate-spin mb-6" />
+          <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#00f0ff] to-[#b026ff]">
+            AI is analyzing your profile...
+          </h2>
+          <p className="text-[#8a8d9b] mt-2">Generating personalized roadmaps from the database</p>
+        </div>
+      )}
+
       {/* Results Screen */}
-      {step === 'results' && (
+      {step === 'results' && aiRoadmaps.length > 0 && (
         <div className="flex-1 flex flex-col items-center justify-between py-8 md:py-12 px-4 w-full animate-in fade-in duration-700">
           <div className="text-center w-full mt-2 md:mt-4">
-            <h2 className="text-[#8a8d9b] uppercase tracking-widest text-xs mb-1">Your Top Skill Track</h2>
+            <h2 className="text-[#8a8d9b] uppercase tracking-widest text-xs mb-1">Your Top AI Recommendation</h2>
             <h1 className="text-4xl md:text-5xl font-bold m-0 text-transparent bg-clip-text bg-gradient-to-r from-[#00f0ff] to-[#b026ff] drop-shadow-[0_0_20px_rgba(0,240,255,0.3)]">
-              {primaryMatch}
+              {aiRoadmaps[0].title}
             </h1>
-            {secondaryMatch && (
-              <div className="mt-2 text-[#8a8d9b] text-sm">
-                Runner up: <span className="text-white font-bold">{secondaryMatch}</span>
-              </div>
-            )}
+            <p className="mt-4 text-[#8a8d9b] max-w-2xl mx-auto">{aiRoadmaps[0].description}</p>
           </div>
 
+          {/* Top Roadmap Render */}
           <div className="w-full max-w-7xl flex-1 flex flex-col justify-center my-8">
             <div className="text-center mb-8">
-              <div className="text-[#00f0ff] uppercase tracking-widest text-xs mb-1">Future Milestones</div>
+              <div className="text-[#00f0ff] uppercase tracking-widest text-xs mb-1">Primary Milestones</div>
               <h3 className="text-2xl md:text-3xl font-bold">Project <span className="text-[#b026ff]">Roadmap</span></h3>
             </div>
 
@@ -303,7 +316,7 @@ export default function AssessmentPage() {
               <div className="md:hidden absolute top-0 bottom-0 left-[34px] w-1 bg-gradient-to-b from-[#00f0ff] to-[#b026ff] z-0"></div>
 
               <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between w-full gap-6 md:gap-3 lg:gap-4 px-4 md:px-8">
-                {(roadmaps[primaryMatch] || []).map((stepDesc, idx) => {
+                {(aiRoadmaps[0].modules || []).map((stepDesc, idx) => {
                   const isBottom = idx % 2 !== 0;
                   const colorClass = isBottom ? 'text-[#b026ff] border-[#b026ff]' : 'text-[#00f0ff] border-[#00f0ff]';
                   const bgClass = isBottom ? 'bg-[#b026ff]' : 'bg-[#00f0ff]';
@@ -311,7 +324,6 @@ export default function AssessmentPage() {
 
                   return (
                     <div key={idx} className="relative flex flex-row md:flex-col items-center md:justify-center w-full md:flex-1 md:max-w-[170px] md:h-0">
-
                       {/* Mobile dot wrapper */}
                       <div className="md:hidden relative z-10 flex-shrink-0 w-[40px] flex justify-center mr-4">
                         <div className={`w-4 h-4 rounded-full bg-[#0b0c10] border-[3px] ${colorClass} ${shadowClass}`}></div>
@@ -353,6 +365,24 @@ export default function AssessmentPage() {
             </div>
           </div>
 
+          {/* Optional Alternative Roadmaps (4 items) */}
+          {aiRoadmaps.length > 1 && (
+            <div className="w-full max-w-4xl mb-12">
+              <h3 className="text-xl font-bold mb-6 text-center text-[#8a8d9b]">Optional Alternative Paths</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {aiRoadmaps.slice(1).map((roadmap, idx) => (
+                  <div key={idx} className="bg-[#15161c] border border-white/10 rounded-xl p-5 hover:border-white/30 transition-colors">
+                    <h4 className="text-lg font-bold text-[#00f0ff] mb-2">{roadmap.title}</h4>
+                    <p className="text-sm text-[#8a8d9b] mb-4">{roadmap.description}</p>
+                    <div className="text-xs text-white/70">
+                      <strong>Modules:</strong> {roadmap.modules?.join(" → ")}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           <div className="flex flex-wrap justify-center gap-4 mb-4">
             <Link
               to="/register"
@@ -383,3 +413,4 @@ export default function AssessmentPage() {
     </div>
   );
 }
+

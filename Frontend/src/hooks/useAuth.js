@@ -6,8 +6,8 @@ export function useAuth() {
 
   const login = async (credentials) => {
     const res = await authService.login(credentials);
-    const { user, token } = res.data.data;
-    store.setAuth(user, token);
+    const { user, accessToken } = res.data.data;
+    store.setAuth(user, accessToken);
     return res;
   };
 

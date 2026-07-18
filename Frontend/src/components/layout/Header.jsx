@@ -31,6 +31,12 @@ export function Header({ toggleSidebar }) {
 
         {user && (
           <nav className="hidden lg:flex items-center gap-1 ml-4 text-sm font-medium">
+            <Link to="/dashboard" className="px-3 py-1.5 rounded-md hover:bg-white/10 transition-colors">Dashboard</Link>
+            <Link to="/explore" className="px-3 py-1.5 rounded-md hover:bg-white/10 transition-colors">Explore</Link>
+            <Link to="/learning" className="px-3 py-1.5 rounded-md hover:bg-white/10 transition-colors">My Learning</Link>
+            <Link to="/chat" className="px-3 py-1.5 rounded-md hover:bg-white/10 transition-colors flex items-center gap-1">
+              LanPya AI
+            </Link>
             <Link to="/dashboard" className="px-3 py-1.5 rounded-lg hover:bg-white/10 transition-colors">Dashboard</Link>
             <Link to="/explore" className="px-3 py-1.5 rounded-lg hover:bg-white/10 transition-colors">Explore</Link>
             <Link to="/learning" className="px-3 py-1.5 rounded-lg hover:bg-white/10 transition-colors">My Learning</Link>
