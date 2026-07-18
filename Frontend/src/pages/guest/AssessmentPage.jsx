@@ -1,236 +1,384 @@
-import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { miscService } from '../../services/miscService';
-import { useGuestStore } from '../../store/guestStore';
-import { ArrowRight, ArrowLeft, Loader2, BookOpen } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { Share2, RefreshCw } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
-export default function AssessmentPage() {
-  const [step, setStep] = useState(1);
-  const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
-  const setGuestData = useGuestStore((state) => state.setGuestData);
-  
-  const [answers, setAnswers] = useState({
-    goal: '',
-    currentLevel: '',
-    interests: []
-  });
-
-  const [generatedRoadmap, setGeneratedRoadmap] = useState(null);
-
-  const handleNext = () => setStep(s => s + 1);
-  const handlePrev = () => setStep(s => s - 1);
-
-  const handleInterestToggle = (interest) => {
-    setAnswers(prev => ({
-      ...prev,
-      interests: prev.interests.includes(interest) 
-        ? prev.interests.filter(i => i !== interest)
-        : [...prev.interests, interest]
-    }));
-  };
-
-  const generateRoadmap = async () => {
-    if (!answers.goal || !answers.currentLevel || answers.interests.length === 0) {
-      toast.error("Please answer all questions");
-      return;
-    }
-    
-    console.log("Generating roadmap...");
-    setLoading(true);
-    try {
-      const response = await miscService.guestAssessment(answers);
-      const roadmapData = response.data?.data?.roadmap;
-      setGeneratedRoadmap(roadmapData);
-      setStep(4); // Results step
-    } catch (error) {
-      toast.error("Failed to generate roadmap. Using fallback.");
-      // Fallback for demo if backend fails
-      setGeneratedRoadmap({
-        title: "Your Custom Tech Path",
-        description: "A tailored roadmap based on your selected interests and goals.",
-        modules: [
-          { title: "Foundations of " + answers.goal, description: "Getting started with core concepts." },
-          { title: "Building Projects", description: "Applying your knowledge practically." }
-        ]
-      });
-      setStep(4);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const finishAssessment = () => {
-    setGuestData(answers, generatedRoadmap);
-    navigate('/dashboard');
-  };
-
-  if (step === 4 && generatedRoadmap) {
-    return (
-      <div className="min-h-screen bg-[#0B1120] text-white py-16 px-4 relative overflow-hidden font-sans w-full">
-        
-        {/* Background glow effects */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-blue-900/20 blur-[120px] rounded-full pointer-events-none"></div>
-
-        <div className="max-w-4xl mx-auto text-center mb-20 relative z-10 mt-8">
-          <div className="inline-flex items-center justify-center px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-sm font-medium mb-6">
-            Your AI Roadmap is Ready
-          </div>
-          <h1 className="text-3xl md:text-5xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-indigo-300">
-            {generatedRoadmap.title}
-          </h1>
-          <p className="text-lg text-gray-400 max-w-2xl mx-auto">
-            {generatedRoadmap.description}
-          </p>
-          
-          <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link to="/register" onClick={finishAssessment} className="bg-blue-600 hover:bg-blue-500 text-white font-medium py-3 px-8 rounded-full transition-all duration-300 shadow-[0_0_20px_rgba(37,99,235,0.4)] hover:shadow-[0_0_30px_rgba(37,99,235,0.6)]">
-              Create Free Account
-            </Link>
-            <button onClick={finishAssessment} className="bg-transparent border border-gray-600 hover:border-gray-400 hover:text-white text-gray-300 font-medium py-3 px-8 rounded-full transition-colors">
-              Continue as Guest
-            </button>
-          </div>
-        </div>
-
-        <div className="max-w-5xl mx-auto relative z-10 pb-20">
-          {/* Central Line */}
-          <div className="absolute left-8 md:left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-blue-500/80 via-blue-900/40 to-transparent transform md:-translate-x-1/2 shadow-[0_0_15px_rgba(59,130,246,0.5)]"></div>
-
-          {generatedRoadmap.modules?.map((m, idx) => {
-            const isLeft = idx % 2 === 0;
-            return (
-              <div key={idx} className={`relative flex items-center justify-between md:justify-normal w-full mb-16 ${isLeft ? 'md:flex-row-reverse' : 'md:flex-row'}`}>
-                
-                {/* Empty side for desktop */}
-                <div className="hidden md:block w-1/2"></div>
-                
-                {/* Glowing Node */}
-                <div className="absolute left-8 md:left-1/2 transform -translate-x-1/2 flex items-center justify-center z-10 w-12 h-12 rounded-full border-2 border-blue-500 bg-[#0B1120] shadow-[0_0_20px_rgba(59,130,246,0.8)] text-blue-400 font-bold text-sm">
-                  {String(idx + 1).padStart(2, '0')}
-                </div>
-                
-                {/* Content Card */}
-                <div className={`w-full ml-20 md:ml-0 md:w-5/12 ${isLeft ? 'md:pr-16' : 'md:pl-16'}`}>
-                  <div className="bg-[#111827] border border-gray-800 rounded-2xl p-6 hover:border-blue-500/40 transition-all duration-300 shadow-xl flex flex-col sm:flex-row gap-6 group">
-                     
-                     {/* Thumbnail */}
-                     <div className="w-24 h-28 rounded-xl bg-gradient-to-br from-[#1E293B] to-[#0F172A] flex-shrink-0 flex flex-col items-center justify-center border border-gray-700/50 group-hover:border-blue-500/30 transition-colors relative overflow-hidden">
-                       <div className="absolute inset-0 bg-blue-500/5 group-hover:bg-blue-500/10 transition-colors"></div>
-                       <span className="text-3xl mb-1 font-black text-transparent bg-clip-text bg-gradient-to-br from-blue-400 to-indigo-600">
-                         {m.title.substring(0, 2).toUpperCase()}
-                       </span>
-                       <span className="text-[10px] text-gray-500 font-medium tracking-wider">MODULE</span>
-                     </div>
-                     
-                     <div className="flex-1 flex flex-col">
-                       <h3 className="text-xl font-bold text-white mb-2 group-hover:text-blue-400 transition-colors">{m.title}</h3>
-                       <p className="text-sm text-gray-400 mb-6 leading-relaxed flex-1">{m.description}</p>
-                       
-                       <div>
-                         <button onClick={finishAssessment} className="bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold py-2 px-6 rounded-full transition-all shadow-[0_0_10px_rgba(37,99,235,0.3)] hover:shadow-[0_0_15px_rgba(37,99,235,0.6)]">
-                           Enroll Now
-                         </button>
-                       </div>
-                     </div>
-                  </div>
-                </div>
-                
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    );
+const questions = [
+  {
+    q: "A friend asks you to help with their birthday party invite. What's most fun?",
+    options: [
+      { text: "Picking colors, fonts, and layout to make it look great", track: "Graphic Design" },
+      { text: "Making a short video invite with music and transitions", track: "Video Editing" },
+      { text: "Writing a catchy caption/story to hype it up", track: "Content Creation" },
+      { text: "Setting up an online RSVP page", track: "WebDev" }
+    ]
+  },
+  {
+    q: "You see an app with a confusing menu. Your first instinct?",
+    options: [
+      { text: "I could redesign this to be way easier to use", track: "UI/UX Design" },
+      { text: "I bet I could fix this with some code", track: "Programming" },
+      { text: "What if this leaks people's data? That's risky", track: "Cybersecurity" },
+      { text: "I'd make a post explaining how to actually use it", track: "Content Creation" }
+    ]
+  },
+  {
+    q: "Your dream project is...",
+    options: [
+      { text: "Building a full website for a small business", track: "WebDev" },
+      { text: "Writing a program that solves a daily problem", track: "Programming" },
+      { text: "Automating boring tasks using AI tools", track: "AI Skills" },
+      { text: "Creating AI-generated art, music, or video", track: "Generative AI" }
+    ]
+  },
+  {
+    q: "Which YouTube video would you click first?",
+    options: [
+      { text: "Photoshop tricks that changed my design career", track: "Graphic Design" },
+      { text: "How hackers break into websites", track: "Cybersecurity" },
+      { text: "I built a business using ChatGPT", track: "AI Skills" },
+      { text: "Editing tricks that make videos go viral", track: "Video Editing" }
+    ]
+  },
+  {
+    q: "In a group project, you'd naturally take the role of...",
+    options: [
+      { text: "The one making eye-catching visuals/thumbnails", track: "Graphic Design" },
+      { text: "The one filming and editing the final video", track: "Video Editing" },
+      { text: "The one writing the script and hook", track: "Content Creation" },
+      { text: "The one running the ad campaign to get views", track: "Digital Marketing" }
+    ]
+  },
+  {
+    q: "Which sounds most satisfying to master?",
+    options: [
+      { text: "Making an app feel intuitive to use", track: "UI/UX Design" },
+      { text: "Getting a website to rank #1 on Google", track: "Digital Marketing" },
+      { text: "Prompting AI to generate exactly what you imagine", track: "Generative AI" },
+      { text: "Finding security holes before hackers do", track: "Cybersecurity" }
+    ]
+  },
+  {
+    q: "A weekend paid gig — you'd pick...",
+    options: [
+      { text: "Designing a logo and brand identity", track: "Graphic Design" },
+      { text: "Building a landing page with code", track: "WebDev" },
+      { text: "Editing a client's YouTube video", track: "Video Editing" },
+      { text: "Running their Instagram ads", track: "Digital Marketing" }
+    ]
+  },
+  {
+    q: "What excites you most about AI?",
+    options: [{ text: "Using it to automate business tasks", track: "AI Skills" },
+    { text: "Using it to generate images, video, or music", track: "Generative AI" },
+    { text: "Using it to write code faster", track: "Programming" },
+    { text: "Making sure AI isn't hacked or misused", track: "Cybersecurity" }
+    ]
+  },
+  {
+    q: "Pick a 'superpower' for a day:",
+    options: [
+      { text: "Instantly know how to code any app", track: "Programming" },
+      { text: "Instantly create any image you imagine", track: "Generative AI" },
+      { text: "Instantly design any professional graphic", track: "Graphic Design" },
+      { text: "Instantly know how any system could be attacked or protected", track: "Cybersecurity" }
+    ]
+  },
+  {
+    q: "You just learned something cool. You'd rather...",
+    options: [
+      { text: "Make a short-form video about it", track: "Content Creation" },
+      { text: "Write a blog/newsletter about it", track: "Digital Marketing" },
+      { text: "Make an infographic explaining it", track: "Graphic Design" },
+      { text: "Build a mini webpage about it", track: "WebDev" }
+    ]
+  },
+  {
+    q: "What would bother you most while using an app?",
+    options: [
+      { text: "Ugly, hard-to-read layout", track: "UI/UX Design" },
+      { text: "Broken buttons or links", track: "Programming" },
+      { text: "Feeling like your data isn't safe", track: "Cybersecurity" },
+      { text: "Boring content with no visuals", track: "Content Creation" }
+    ]
+  },
+  {
+    q: "Your ideal 'flow state' activity is...",
+    options: [
+      { text: "Editing clips until the pacing feels perfect", track: "Video Editing" },
+      { text: "Solving a logic puzzle or debugging code", track: "Programming" },
+      { text: "Sketching layouts and picking color palettes", track: "Graphic Design" },
+      { text: "Brainstorming with AI to generate ideas", track: "AI Skills" }
+    ]
+  },
+  {
+    q: "Which job title interests you most?",
+    options: [
+      { text: "Freelance Web Developer", track: "WebDev" },
+      { text: "Social Media Manager", track: "Digital Marketing" },
+      { text: "Cybersecurity Analyst", track: "Cybersecurity" },
+      { text: "Content Creator / YouTuber", track: "Content Creation" }
+    ]
+  },
+  {
+    q: "What would you build for a hackathon demo?",
+    options: [
+      { text: "A working prototype with a clean interface", track: "UI/UX Design" },
+      { text: "An AI tool that auto-generates content", track: "Generative AI" },
+      { text: "A short promo video for the product", track: "Video Editing" },
+      { text: "A marketing plan to launch it", track: "Digital Marketing" }
+    ]
+  },
+  {
+    q: "Which compliment means the most to you?",
+    options: [
+      { text: "Your designs always look so professional", track: "Graphic Design" },
+      { text: "You explain things so clearly, I love your content", track: "Content Creation" },
+      { text: "Your code actually works flawlessly", track: "Programming" },
+      { text: "I feel safe because you protect our data", track: "Cybersecurity" }
+    ]
   }
+];
+
+const roadmaps = {
+  "Graphic Design": ["Beginner Photoshop", "Typography", "Color Theory", "Adobe Illustrator", "Logo & Branding", "Goal: Build your own Portfolio"],
+  "UI/UX Design": ["Design Principles (Color Theory & Layout)", "Figma Mastery", "User Interface (UI) Design", "User Experience (UX) Architecture", "Prototyping & Handoff"],
+  "WebDev": ["Foundation: HTML, CSS, JS", "Node/Express", "PHP / Laravel", "Databases", "Web Hosting"],
+  "Programming": ["Python (Syntax, logic, scripting)", "Java (OOP, strict typing)", "Databases & SQL", "Algorithms & Data Structures", "Git/GitHub & Basic Cloud Hosting"],
+  "Video Editing": ["CapCut (Short-form & speed)", "Premiere Pro (Industry standard)", "DaVinci Resolve (Color grading)", "After Effects (Motion & VFX)", "AI Generation: Kling, Luma Dream Machine"],
+  "Digital Marketing": ["Content Marketing", "SEO", "Social Media Marketing", "Email Marketing", "Performance Marketing (Meta/Google Ads)"],
+  "AI Skills": ["ChatGPT & Applied LLMs", "Prompt Engineering", "Generative AI", "AI Automation", "Agentic AI"],
+  "Generative AI": ["Image & Art Generation", "Video & Motion Generation", "Audio & Voice Synthesis", "3D & Asset Generation", "UI & Frontend Generation"],
+  "Cybersecurity": ["Networking Basics", "Cybersecurity Fundamentals", "Ethical Hacking Basics", "Web App Security & OWASP Top 10", "Systems Security & Incident Response"],
+  "Content Creation": ["Scriptwriting & Storytelling", "Graphic Design Fundamentals (Thumbnails)", "Mobile Videography & Audio", "Mobile Video Editing (CapCut Basics)", "Platform Algorithms & Analytics"]
+};
+
+export default function AssessmentPage() {
+  const [step, setStep] = useState('quiz'); // 'quiz', 'results'
+  const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [scores, setScores] = useState({});
+  const [primaryMatch, setPrimaryMatch] = useState('');
+  const [secondaryMatch, setSecondaryMatch] = useState('');
+  const [hasSavedResult, setHasSavedResult] = useState(false);
+
+  // Random sorting options for current question
+  const [shuffledOptions, setShuffledOptions] = useState([]);
+
+  useEffect(() => {
+    const saved = localStorage.getItem('skillPathResult');
+    if (saved) {
+      setHasSavedResult(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (step === 'quiz') {
+      const opts = [...questions[currentQuestion].options].sort(() => Math.random() - 0.5);
+      setShuffledOptions(opts);
+    }
+  }, [currentQuestion, step]);
+
+  const handleStart = () => {
+    setStep('quiz');
+    setCurrentQuestion(0);
+    setScores({});
+  };
+
+  const handleResume = () => {
+    const savedStr = localStorage.getItem('skillPathResult');
+    if (savedStr) {
+      try {
+        const saved = JSON.parse(savedStr);
+        setPrimaryMatch(saved.primary);
+        setSecondaryMatch(saved.secondary);
+        setStep('results');
+      } catch (e) {
+        handleStart();
+      }
+    } else {
+      handleStart();
+    }
+  };
+
+  const handleOptionSelect = (track) => {
+    const newScores = { ...scores, [track]: (scores[track] || 0) + 1 };
+    setScores(newScores);
+
+    setTimeout(() => {
+      if (currentQuestion < questions.length - 1) {
+        setCurrentQuestion(prev => prev + 1);
+      } else {
+        const sortedTracks = Object.keys(newScores).sort((a, b) => newScores[b] - newScores[a]);
+        const primary = sortedTracks[0] || "Programming";
+        const secondary = sortedTracks.length > 1 ? sortedTracks[1] : null;
+
+        setPrimaryMatch(primary);
+        setSecondaryMatch(secondary);
+        localStorage.setItem('skillPathResult', JSON.stringify({ primary, secondary }));
+        setStep('results');
+      }
+    }, 300);
+  };
+
+  const shareResult = () => {
+    const text = `I just took the Hackathon 2026 Skill Path Finder! My top track is ${primaryMatch}. Find your passion too!`;
+    if (navigator.share) {
+      navigator.share({
+        title: 'My Skill Path',
+        text: text,
+        url: window.location.href,
+      }).catch(console.error);
+    } else {
+      navigator.clipboard.writeText(text).then(() => {
+        toast.success('Result copied to clipboard!');
+      });
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-[#F6F8FA] flex flex-col items-center justify-center p-4">
-      <div className="w-full max-w-2xl gh-box bg-white overflow-hidden">
-        
-        {/* Progress Bar */}
-        <div className="h-2 w-full bg-[#E5E7EB]">
-          <div 
-            className="h-full bg-accent transition-all duration-300"
-            style={{ width: `${(step / 4) * 100}%` }}
-          />
+    <div className="flex-1 min-h-[calc(100vh-64px)] flex flex-col bg-[#0b0c10] text-white font-sans overflow-x-hidden"
+      style={{
+        backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px)',
+        backgroundSize: '40px 40px'
+      }}
+    >
+      {/* Quiz Screen */}
+      {step === 'quiz' && (
+        <div className="flex-1 flex flex-col items-center justify-center p-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <div className="w-full max-w-2xl mb-12">
+            <div className="text-right text-[#8a8d9b] text-sm mb-2">Question {currentQuestion + 1} of 15</div>
+            <div className="w-full bg-white/10 h-2 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-gradient-to-r from-[#00f0ff] to-[#b026ff] transition-all duration-300"
+                style={{ width: `${(currentQuestion / questions.length) * 100}%` }}
+              ></div>
+            </div>
+          </div>
+
+          <h2 className="text-2xl md:text-3xl text-center mb-10 max-w-2xl leading-relaxed">
+            {questions[currentQuestion].q}
+          </h2>
+
+          <div className="grid grid-cols-1 gap-4 w-full max-w-2xl">
+            {shuffledOptions.map((opt, idx) => (
+              <button
+                key={idx}
+                onClick={() => handleOptionSelect(opt.track)}
+                className="bg-[#15161c] border border-white/5 p-5 rounded-xl text-left text-lg hover:border-[#00f0ff] hover:bg-[#00f0ff]/5 hover:translate-x-2 hover:shadow-[0_0_15px_rgba(0,240,255,0.15)] transition-all duration-200"
+              >
+                {opt.text}
+              </button>
+            ))}
+          </div>
         </div>
+      )}
 
-        <div className="p-8 md:p-12">
-          {step === 1 && (
-            <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-              <h2 className="text-2xl font-bold text-[#24292F] mb-6">What is your primary goal?</h2>
-              <div className="space-y-3">
-                {['Become a Frontend Developer', 'Become a Backend Developer', 'Learn AI & Machine Learning', 'Improve existing skills'].map((goal) => (
-                  <button
-                    key={goal}
-                    onClick={() => { setAnswers({ ...answers, goal }); handleNext(); }}
-                    className={`w-full text-left p-4 rounded-md border transition-all ${answers.goal === goal ? 'border-accent bg-accent/5 ring-1 ring-accent' : 'border-[#D0D7DE] hover:border-[#8C959F] bg-white'}`}
-                  >
-                    <span className="font-medium text-[#24292F]">{goal}</span>
-                  </button>
-                ))}
+      {/* Results Screen */}
+      {step === 'results' && (
+        <div className="flex-1 flex flex-col items-center justify-center py-12 px-4 w-full animate-in fade-in duration-700">
+          <div className="text-center mb-4 md:mb-6">
+            <h2 className="text-[#8a8d9b] uppercase tracking-widest text-xs mb-1">Your Top Skill Track</h2>
+            <h1 className="text-4xl md:text-5xl font-bold m-0 text-transparent bg-clip-text bg-gradient-to-r from-[#00f0ff] to-[#b026ff] drop-shadow-[0_0_20px_rgba(0,240,255,0.3)]">
+              {primaryMatch}
+            </h1>
+            {secondaryMatch && (
+              <div className="mt-2 text-[#8a8d9b] text-sm">
+                Runner up: <span className="text-white font-bold">{secondaryMatch}</span>
               </div>
-            </div>
-          )}
+            )}
+          </div>
 
-          {step === 2 && (
-            <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-              <button onClick={handlePrev} className="text-[#57606A] hover:text-[#24292F] mb-4 flex items-center gap-1 text-sm"><ArrowLeft className="w-4 h-4"/> Back</button>
-              <h2 className="text-2xl font-bold text-[#24292F] mb-6">What is your current level?</h2>
-              <div className="space-y-3">
-                {[
-                  { level: 'Beginner', desc: 'I have little to no programming experience.' },
-                  { level: 'Intermediate', desc: 'I can write code but want to build real projects.' },
-                  { level: 'Advanced', desc: 'I want to master complex architectural concepts.' }
-                ].map((item) => (
-                  <button
-                    key={item.level}
-                    onClick={() => { setAnswers({ ...answers, currentLevel: item.level }); handleNext(); }}
-                    className={`w-full text-left p-4 rounded-md border transition-all ${answers.currentLevel === item.level ? 'border-accent bg-accent/5 ring-1 ring-accent' : 'border-[#D0D7DE] hover:border-[#8C959F] bg-white'}`}
-                  >
-                    <span className="font-medium text-[#24292F] block mb-1">{item.level}</span>
-                    <span className="text-sm text-[#57606A] block">{item.desc}</span>
-                  </button>
-                ))}
-              </div>
+          <div className="w-full mb-10 max-w-7xl">
+            <div className="text-center mb-8">
+              <div className="text-[#00f0ff] uppercase tracking-widest text-xs mb-1">Future Milestones</div>
+              <h3 className="text-2xl md:text-3xl font-bold">Project <span className="text-[#b026ff]">Roadmap</span></h3>
             </div>
-          )}
 
-          {step === 3 && (
-            <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-              <button onClick={handlePrev} className="text-[#57606A] hover:text-[#24292F] mb-4 flex items-center gap-1 text-sm"><ArrowLeft className="w-4 h-4"/> Back</button>
-              <h2 className="text-2xl font-bold text-[#24292F] mb-2">Select your interests</h2>
-              <p className="text-[#57606A] mb-6 text-sm">Choose at least one topic to help AI generate your roadmap.</p>
-              
-              <div className="flex flex-wrap gap-3 mb-8">
-                {['React', 'Node.js', 'Python', 'Machine Learning', 'DevOps', 'TypeScript', 'Next.js', 'PostgreSQL', 'Docker'].map((interest) => {
-                  const isSelected = answers.interests.includes(interest);
+            <div className="relative w-full py-8 md:py-20 flex flex-col md:flex-row md:justify-center md:items-center">
+              {/* Desktop Horizontal Line */}
+              <div className="hidden md:block absolute top-1/2 left-[3%] right-[3%] h-[3px] bg-gradient-to-r from-[#00f0ff] to-[#b026ff] -translate-y-1/2 shadow-[0_0_15px_rgba(0,240,255,0.4)] z-0"></div>
+
+              {/* Mobile Vertical Line */}
+              <div className="md:hidden absolute top-0 bottom-0 left-[34px] w-1 bg-gradient-to-b from-[#00f0ff] to-[#b026ff] z-0"></div>
+
+              <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between w-full gap-6 md:gap-3 lg:gap-4 px-4 md:px-8">
+                {(roadmaps[primaryMatch] || []).map((stepDesc, idx) => {
+                  const isBottom = idx % 2 !== 0;
+                  const colorClass = isBottom ? 'text-[#b026ff] border-[#b026ff]' : 'text-[#00f0ff] border-[#00f0ff]';
+                  const bgClass = isBottom ? 'bg-[#b026ff]' : 'bg-[#00f0ff]';
+                  const shadowClass = isBottom ? 'shadow-[0_0_10px_#b026ff]' : 'shadow-[0_0_10px_#00f0ff]';
+
                   return (
-                    <button
-                      key={interest}
-                      onClick={() => handleInterestToggle(interest)}
-                      className={`px-4 py-2 rounded-full border text-sm font-medium transition-colors
-                        ${isSelected ? 'bg-[#24292F] text-white border-[#24292F]' : 'bg-white text-[#24292F] border-[#D0D7DE] hover:border-[#8C959F]'}`}
-                    >
-                      {interest}
-                    </button>
+                    <div key={idx} className="relative flex flex-row md:flex-col items-center md:justify-center w-full md:flex-1 md:max-w-[170px] md:h-0">
+
+                      {/* Mobile dot wrapper */}
+                      <div className="md:hidden relative z-10 flex-shrink-0 w-[40px] flex justify-center mr-4">
+                        <div className={`w-4 h-4 rounded-full bg-[#0b0c10] border-[3px] ${colorClass} ${shadowClass}`}></div>
+                      </div>
+
+                      {/* Desktop dot */}
+                      <div className={`hidden md:block absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-[#0b0c10] border-[3px] z-20 ${colorClass} ${shadowClass}`}></div>
+
+                      {/* Card Mobile */}
+                      <div className={`md:hidden w-full bg-[#15161c] rounded-xl p-4 shadow-xl border-l-4 ${colorClass}`}>
+                        <div className={`text-[10px] uppercase font-bold mb-1 ${isBottom ? 'text-[#b026ff]' : 'text-[#00f0ff]'}`}>Step {idx + 1}</div>
+                        <div className="text-[14px] leading-snug">{stepDesc}</div>
+                      </div>
+
+                      {/* Desktop Layout */}
+                      <div className={`hidden md:flex absolute flex-col items-center w-full`} style={{ [isBottom ? 'top' : 'bottom']: '0px' }}>
+                        {!isBottom ? (
+                          <>
+                            <div className={`w-full bg-[#15161c] rounded-xl p-3 shadow-xl border-t-2 border-l-[1px] border-r-[1px] border-b-[1px] border-b-white/5 border-l-white/10 border-r-white/5 ${colorClass} hover:shadow-[0_0_15px_rgba(0,240,255,0.2)] transition-shadow`}>
+                              <div className={`text-[10px] uppercase tracking-wider font-bold mb-1 text-[#00f0ff]`}>Step {idx + 1}</div>
+                              <div className="text-[13px] leading-tight">{stepDesc}</div>
+                            </div>
+                            <div className={`w-[2px] h-[30px] ${bgClass}`}></div>
+                          </>
+                        ) : (
+                          <>
+                            <div className={`w-[2px] h-[30px] ${bgClass}`}></div>
+                            <div className={`w-full bg-[#15161c] rounded-xl p-3 shadow-xl border-b-2 border-l-[1px] border-r-[1px] border-t-[1px] border-t-white/5 border-l-white/10 border-r-white/5 ${colorClass} hover:shadow-[0_0_15px_rgba(176,38,255,0.2)] transition-shadow`}>
+                              <div className={`text-[10px] uppercase tracking-wider font-bold mb-1 text-[#b026ff]`}>Step {idx + 1}</div>
+                              <div className="text-[13px] leading-tight">{stepDesc}</div>
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    </div>
                   );
                 })}
               </div>
-
-              <button 
-                onClick={generateRoadmap}
-                disabled={loading || answers.interests.length === 0}
-                className="btn btn-primary w-full py-3 text-base flex items-center justify-center gap-2 disabled:opacity-50"
-              >
-                {loading ? <><Loader2 className="w-5 h-5 animate-spin" /> Generating Roadmap...</> : 'Generate My Roadmap'}
-              </button>
             </div>
-          )}
+          </div>
+
+          <div className="flex flex-wrap justify-center gap-4 mt-16 md:mt-24">
+            <Link
+              to="/register"
+              className="flex items-center justify-center gap-2 bg-gradient-to-r from-[#00f0ff] to-[#b026ff] text-white font-bold py-3 px-8 rounded-full hover:-translate-y-1 transition-all shadow-[0_4px_15px_rgba(176,38,255,0.3)]"
+            >
+              Create an Account
+            </Link>
+            <button
+              onClick={shareResult}
+              className="flex items-center gap-2 bg-transparent border-2 border-[#00f0ff] text-[#00f0ff] hover:bg-[#00f0ff]/10 font-bold py-3 px-8 rounded-full transition-all"
+            >
+              <Share2 className="w-5 h-5" /> Share
+            </button>
+            <button
+              onClick={handleStart}
+              className="flex items-center gap-2 bg-transparent border-2 border-white/20 text-white hover:border-white hover:text-white font-bold py-3 px-8 rounded-full transition-all"
+            >
+              <RefreshCw className="w-5 h-5" /> Retake
+            </button>
+          </div>
         </div>
-      </div>
+      )}
+
+      {/* Footer */}
+      <footer className="w-full mt-auto bg-gradient-to-r from-[#b026ff] to-[#6d28d9] shadow-[0_-5px_20px_rgba(176,38,255,0.2)] text-white text-center py-4 relative z-50">
+        <p className="text-sm tracking-widest font-semibold">&copy; 2026 Smart Innovators</p>
+      </footer>
     </div>
   );
 }
