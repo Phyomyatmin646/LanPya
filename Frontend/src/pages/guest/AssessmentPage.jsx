@@ -275,8 +275,8 @@ export default function AssessmentPage() {
 
       {/* Results Screen */}
       {step === 'results' && (
-        <div className="flex-1 flex flex-col items-center justify-center py-12 px-4 w-full animate-in fade-in duration-700">
-          <div className="text-center mb-4 md:mb-6">
+        <div className="flex-1 flex flex-col items-center justify-between py-8 md:py-12 px-4 w-full animate-in fade-in duration-700">
+          <div className="text-center w-full mt-2 md:mt-4">
             <h2 className="text-[#8a8d9b] uppercase tracking-widest text-xs mb-1">Your Top Skill Track</h2>
             <h1 className="text-4xl md:text-5xl font-bold m-0 text-transparent bg-clip-text bg-gradient-to-r from-[#00f0ff] to-[#b026ff] drop-shadow-[0_0_20px_rgba(0,240,255,0.3)]">
               {primaryMatch}
@@ -288,7 +288,7 @@ export default function AssessmentPage() {
             )}
           </div>
 
-          <div className="w-full mb-10 max-w-7xl">
+          <div className="w-full max-w-7xl flex-1 flex flex-col justify-center my-8">
             <div className="text-center mb-8">
               <div className="text-[#00f0ff] uppercase tracking-widest text-xs mb-1">Future Milestones</div>
               <h3 className="text-2xl md:text-3xl font-bold">Project <span className="text-[#b026ff]">Roadmap</span></h3>
@@ -352,7 +352,7 @@ export default function AssessmentPage() {
             </div>
           </div>
 
-          <div className="flex flex-wrap justify-center gap-4 mt-16 md:mt-24">
+          <div className="flex flex-wrap justify-center gap-4 mb-4">
             <Link
               to="/register"
               className="flex items-center justify-center gap-2 bg-gradient-to-r from-[#00f0ff] to-[#b026ff] text-white font-bold py-3 px-8 rounded-full hover:-translate-y-1 transition-all shadow-[0_4px_15px_rgba(176,38,255,0.3)]"
