@@ -98,7 +98,11 @@ export default function LandingPage() {
             <Link to="/assessment" className="btn btn-dark">
               စိတ်ဝင်စားတာလေ့လာမယ်
               <svg className="arrow amber-arrow" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
-              </header>
+            </Link>
+          </div>
+        </div>
+        <div className="divider"></div>
+      </header>
 
       {/* Section 1: Feature Cards */}
       <section className="py-12 relative overflow-hidden bg-[#060608] px-4 sm:px-6">
