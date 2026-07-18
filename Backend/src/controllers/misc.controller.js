@@ -5,6 +5,10 @@ const Bookmark = require("../models/bookmark.model");
 const Rating = require("../models/rating.model");
 const Announcement = require("../models/announcement.model");
 const Roadmap = require("../models/roadmap.model");
+const Enrollment = require("../models/enrollment.model");
+const LessonProgress = require("../models/lessonProgress.model");
+const User = require("../models/user.model");
+const mongoose = require("mongoose");
 
 exports.getComments = asyncHandler(async (req, res) => {
   res.status(200).json(ApiResponse.success([], "Comments fetched successfully"));
@@ -124,4 +128,111 @@ exports.generateGuestAssessment = asyncHandler(async (req, res) => {
   }
 
   res.status(200).json(ApiResponse.success({ roadmap: roadmapData }, "Guest roadmap generated successfully"));
+});
+
+// ── Trending Roadmaps (public) ────────────────────────────────
+exports.getTrendingRoadmaps = asyncHandler(async (req, res) => {
+  const limit = parseInt(req.query.limit, 10) || 6;
+
+  const enrollmentCounts = await Enrollment.aggregate([
+    { $group: { _id: "$roadmap_id", count: { $sum: 1 } } },
+    { $sort: { count: -1 } },
+    { $limit: limit },
+  ]);
+
+  const roadmapIds = enrollmentCounts.map((e) => e._id);
+  const countMap = {};
+  enrollmentCounts.forEach((e) => { countMap[e._id.toString()] = e.count; });
+
+  let roadmaps = [];
+  if (roadmapIds.length > 0) {
+    const found = await Roadmap.find({ _id: { $in: roadmapIds }, is_public: true })
+      .populate("category_id", "name slug icon")
+      .populate("created_by", "full_name avatar")
+      .lean();
+    roadmaps = found
+      .map((r) => ({ ...r, enrollment_count: countMap[r._id.toString()] || 0 }))
+      .sort((a, b) => b.enrollment_count - a.enrollment_count);
+  }
+
+  // Fallback: pad with newest public roadmaps if not enough
+  if (roadmaps.length < limit) {
+    const existingIds = roadmaps.map((r) => r._id.toString());
+    const extra = await Roadmap.find({ is_public: true, _id: { $nin: roadmapIds } })
+      .populate("category_id", "name slug icon")
+      .populate("created_by", "full_name avatar")
+      .sort({ created_at: -1 })
+      .limit(limit - roadmaps.length)
+      .lean();
+    roadmaps = [...roadmaps, ...extra.map((r) => ({ ...r, enrollment_count: 0 }))];
+  }
+
+  res.status(200).json(ApiResponse.success(roadmaps, "Trending roadmaps"));
+});
+
+// ── Leaderboard (public) ──────────────────────────────────────
+exports.getLeaderboard = asyncHandler(async (req, res) => {
+  const limit = parseInt(req.query.limit, 10) || 10;
+
+  const ranked = await LessonProgress.aggregate([
+    { $match: { completed: true } },
+    { $group: { _id: "$user_id", completed_lessons: { $sum: 1 } } },
+    { $sort: { completed_lessons: -1 } },
+    { $limit: limit },
+  ]);
+
+  const userIds = ranked.map((r) => r._id);
+  const users = await User.find({ _id: { $in: userIds } })
+    .select("username full_name avatar")
+    .lean();
+
+  const userMap = {};
+  users.forEach((u) => { userMap[u._id.toString()] = u; });
+
+  const leaderboard = ranked.map((r, idx) => ({
+    rank: idx + 1,
+    completed_lessons: r.completed_lessons,
+    ...(userMap[r._id.toString()] || { username: "learner", full_name: "LanPya Learner", avatar: "" }),
+  }));
+
+  res.status(200).json(ApiResponse.success(leaderboard, "Leaderboard fetched"));
+});
+
+// ── Guest Recommendations (public) ───────────────────────────
+exports.getGuestRecommendations = asyncHandler(async (req, res) => {
+  const { interests } = req.query;
+  const limit = parseInt(req.query.limit, 10) || 6;
+
+  let roadmaps = [];
+
+  if (interests) {
+    const keywords = interests.split(",").map((k) => k.trim()).filter(Boolean);
+    const regexList = keywords.map((k) => new RegExp(k, "i"));
+
+    roadmaps = await Roadmap.find({
+      is_public: true,
+      $or: [
+        { title: { $in: regexList } },
+        { description: { $in: regexList } },
+      ],
+    })
+      .populate("category_id", "name slug icon")
+      .populate("created_by", "full_name avatar")
+      .limit(limit)
+      .lean();
+  }
+
+  // Fallback: pad with newest public roadmaps if not enough matches
+  if (roadmaps.length < limit) {
+    const existingIds = roadmaps.map((r) => r._id);
+    const extra = await Roadmap.find({ is_public: true, _id: { $nin: existingIds } })
+      .populate("category_id", "name slug icon")
+      .populate("created_by", "full_name avatar")
+      .sort({ created_at: -1 })
+      .limit(limit - roadmaps.length)
+      .lean();
+    roadmaps = [...roadmaps, ...extra];
+  }
+
+  res.status(200).json(ApiResponse.success(roadmaps, "Guest recommendations fetched"));
 });

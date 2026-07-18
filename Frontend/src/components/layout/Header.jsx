@@ -22,10 +22,11 @@ export function Header({ toggleSidebar }) {
         </button>
         
         <Link to="/" className="flex items-center gap-2 text-white hover:text-white/80 transition-opacity">
-          <div className="w-8 h-8 rounded-full bg-accent flex items-center justify-center font-bold text-white text-lg">
-            L
-          </div>
-          <span className="font-bold text-xl hidden sm:inline-block">LanPya</span>
+          <img
+            src="/LanPya_logo.png"
+            alt="LanPya Logo"
+            className="w-10 h-10 object-contain"
+          />
         </Link>
 
         {user && (
