@@ -34,7 +34,7 @@ export default function RegisterPage() {
       // For now, we just clear it because they've upgraded.
       if (generatedRoadmap) {
         toast.success('Registration successful! Your assessment was synced.');
-        clearGuestData();
+        // We do not clear guest data here, so it persists to the dashboard.
       } else {
         toast.success('Registration successful! Please login.');
       }

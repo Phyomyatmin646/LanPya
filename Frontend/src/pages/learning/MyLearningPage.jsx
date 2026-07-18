@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { BookOpen, CheckCircle2, ChevronRight, Activity } from 'lucide-react';
 import { Skeleton } from '../../components/ui/Skeleton';
 import { EmptyState } from '../../components/ui/States';
+import { useGuestStore } from '../../store/guestStore';
 
 export default function MyLearningPage() {
   const { data: progressResponse, isLoading } = useQuery({
@@ -11,12 +12,39 @@ export default function MyLearningPage() {
     queryFn: () => progressService.getMyProgress(),
   });
 
-  const enrolledRoadmaps = progressResponse?.data?.data || [];
+  const { savedAiRoadmaps, generatedRoadmap } = useGuestStore();
+
+  const apiRoadmaps = progressResponse?.data?.data || [];
+  
+  // Inject the custom AI roadmaps if they exist
+  const enrolledRoadmaps = [...apiRoadmaps];
+  
+  // Backwards compatibility with the old single object
+  const aiRoadmaps = Array.isArray(savedAiRoadmaps) && savedAiRoadmaps.length > 0 
+    ? savedAiRoadmaps 
+    : (generatedRoadmap ? [{...generatedRoadmap, _id: 'custom-ai-roadmap'}] : []);
+
+  // Reverse so newest is first
+  [...aiRoadmaps].reverse().forEach((aiRm) => {
+    enrolledRoadmaps.unshift({
+      _id: aiRm._id || `custom-ai-${Date.now()}`,
+      isCustom: true,
+      roadmap: {
+        _id: aiRm._id || 'custom-ai-roadmap', // We use this in the link
+        title: aiRm.title,
+        description: aiRm.description || 'Your custom AI generated roadmap path.'
+      },
+      progress_percentage: 0
+    });
+  });
 
   return (
     <div className="container-gh py-8">
       <div className="flex items-center justify-between mb-6 pb-2 border-b border-[#D0D7DE]">
         <h1 className="text-2xl font-semibold text-[#24292F]">My Learning</h1>
+        <Link to="/assessment" className="btn btn-primary text-sm">
+          Get New AI Path
+        </Link>
       </div>
 
       {isLoading ? (
@@ -63,7 +91,9 @@ export default function MyLearningPage() {
                 </div>
               </div>
               <div className="bg-[#F6F8FA] px-4 py-3 border-t border-[#D0D7DE] flex items-center justify-between">
-                {prog.progress_percentage === 100 ? (
+                {prog.isCustom ? (
+                  <span className="text-xs text-[#8955F3] font-semibold">Custom AI Path</span>
+                ) : prog.progress_percentage === 100 ? (
                   <span className="flex items-center gap-1 text-sm font-medium text-[#1A7F37]">
                     <CheckCircle2 className="w-4 h-4" /> Completed
                   </span>
@@ -71,7 +101,7 @@ export default function MyLearningPage() {
                   <span className="text-xs text-[#57606A]">Keep going!</span>
                 )}
                 <Link to={`/roadmaps/${prog.roadmap._id}`} className="btn btn-default text-xs py-1 h-7">
-                  Continue <ChevronRight className="w-3 h-3 ml-1" />
+                  {prog.isCustom ? 'View' : 'Continue'} <ChevronRight className="w-3 h-3 ml-1" />
                 </Link>
               </div>
             </div>

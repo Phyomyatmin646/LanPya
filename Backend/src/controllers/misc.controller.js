@@ -105,15 +105,21 @@ exports.generateGuestAssessment = asyncHandler(async (req, res) => {
 
   const systemInstruction = `You are an expert technical learning advisor for the LanPya platform.
 Your task is to recommend exactly 5 learning roadmaps based on the user's top tracked interests and the platform's available roadmaps.
-The first roadmap should be the absolute best match (Top choice), and the remaining 4 should be optional alternative paths.
+The first roadmap should be the absolute best match (Top choice), and the remaining 4 should be optional alternative paths representing top careers.
 
 Output ONLY valid JSON containing an array of exactly 5 roadmap objects.
 Format:
 [
   {
-    "title": "Roadmap Title",
-    "description": "Short description of the path",
-    "modules": [ "Module 1", "Module 2", "Module 3", "Module 4", "Module 5" ],
+    "title": "Roadmap Title (e.g. Frontend Developer)",
+    "description": "Short description of the career path",
+    "modules": [ 
+      { "name": "Step 1 name", "tech": "Tech step 1" },
+      { "name": "Step 2 name", "tech": "Tech step 2" },
+      { "name": "Step 3 name", "tech": "Tech step 3" },
+      { "name": "Step 4 name", "tech": "Tech step 4" },
+      { "name": "Step 5 name", "tech": "Tech step 5" }
+    ],
     "isTopMatch": true // ONLY true for the first one
   },
   ...
@@ -142,13 +148,19 @@ Please generate the 5 roadmaps array now.`;
       {
         title: `${topTracks[0] || "Custom"} Master Path`,
         description: "Your personalized top recommendation based on your quiz.",
-        modules: ["Basics", "Intermediate Concepts", "Advanced Projects"],
+        modules: [
+          { name: "Basics", tech: "HTML/CSS, Python or UI Principles" },
+          { name: "Intermediate Concepts", tech: "JS, Git, or Figma" },
+          { name: "Advanced Projects", tech: "Frameworks, Docker, or Prototyping" },
+          { name: "Portfolio", tech: "Build real projects" },
+          { name: "Career Prep", tech: "Interview Prep, Resume" }
+        ],
         isTopMatch: true
       },
-      { title: "Alternative Path 1", description: "Optional path", modules: ["Concept 1", "Concept 2"], isTopMatch: false },
-      { title: "Alternative Path 2", description: "Optional path", modules: ["Concept 1", "Concept 2"], isTopMatch: false },
-      { title: "Alternative Path 3", description: "Optional path", modules: ["Concept 1", "Concept 2"], isTopMatch: false },
-      { title: "Alternative Path 4", description: "Optional path", modules: ["Concept 1", "Concept 2"], isTopMatch: false }
+      { title: "Alternative Path 1", description: "Optional path", modules: [{name: "Concept 1", tech: "Tech 1"}, {name: "Concept 2", tech: "Tech 2"}, {name: "Concept 3", tech: "Tech 3"}, {name: "Concept 4", tech: "Tech 4"}, {name: "Concept 5", tech: "Tech 5"}], isTopMatch: false },
+      { title: "Alternative Path 2", description: "Optional path", modules: [{name: "Concept 1", tech: "Tech 1"}, {name: "Concept 2", tech: "Tech 2"}, {name: "Concept 3", tech: "Tech 3"}, {name: "Concept 4", tech: "Tech 4"}, {name: "Concept 5", tech: "Tech 5"}], isTopMatch: false },
+      { title: "Alternative Path 3", description: "Optional path", modules: [{name: "Concept 1", tech: "Tech 1"}, {name: "Concept 2", tech: "Tech 2"}, {name: "Concept 3", tech: "Tech 3"}, {name: "Concept 4", tech: "Tech 4"}, {name: "Concept 5", tech: "Tech 5"}], isTopMatch: false },
+      { title: "Alternative Path 4", description: "Optional path", modules: [{name: "Concept 1", tech: "Tech 1"}, {name: "Concept 2", tech: "Tech 2"}, {name: "Concept 3", tech: "Tech 3"}, {name: "Concept 4", tech: "Tech 4"}, {name: "Concept 5", tech: "Tech 5"}], isTopMatch: false }
     ];
   }
 

@@ -1,9 +1,11 @@
-import api from '@/api/axios';
+import { api } from './api';
 
 export const quizService = {
-  getByLesson:  (lessonId)          => api.get(`/quizzes/lesson/${lessonId}`),
-  create:       (lessonId, data)    => api.post(`/quizzes/lesson/${lessonId}`, data),
-  addQuestion:  (quizId, data)      => api.post(`/quizzes/${quizId}/questions`, data),
-  submit:       (quizId, answers)   => api.post(`/quizzes/${quizId}/submit`, { answers }),
-  getAttempts:  (quizId)            => api.get(`/quizzes/${quizId}/attempts`),
+  getQuizByLesson: async (lessonId) => {
+    return api.get(`/quiz/lesson/${lessonId}`);
+  },
+  
+  submitAttempt: async (quizId, answers) => {
+    return api.post(`/quiz/${quizId}/submit`, { answers });
+  }
 };

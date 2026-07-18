@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useGuestStore } from '../../store/guestStore';
 import { Share2, RefreshCw } from 'lucide-react';
 import { toast } from 'react-hot-toast';
+import { useAuth } from '../../hooks/useAuth';
 
 const questions = [
   {
@@ -160,6 +162,10 @@ export default function AssessmentPage() {
   const [scores, setScores] = useState({});
   const [aiRoadmaps, setAiRoadmaps] = useState([]);
   
+  const navigate = useNavigate();
+  const setGuestData = useGuestStore(state => state.setGuestData);
+  const { user } = useAuth();
+  
   // Random sorting options for current question
   const [shuffledOptions, setShuffledOptions] = useState([]);
 
@@ -223,6 +229,29 @@ export default function AssessmentPage() {
         fetchAiRoadmaps(topTracks);
       }
     }, 300);
+  };
+
+  const handleAlternativeClick = (index) => {
+    // Swap the clicked alternative with the current top match
+    const newRoadmaps = [...aiRoadmaps];
+    const clicked = newRoadmaps[index];
+    newRoadmaps[index] = newRoadmaps[0];
+    newRoadmaps[0] = clicked;
+    setAiRoadmaps(newRoadmaps);
+    // Smooth scroll to top
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleSaveClick = () => {
+    // Save current top roadmap before redirecting
+    const topTracks = Object.keys(scores).sort((a, b) => scores[b] - scores[a]).slice(0, 3);
+    setGuestData({ interests: topTracks }, aiRoadmaps[0]);
+    if (user) {
+      toast.success('Roadmap saved to My Learning!');
+      navigate('/mylearning');
+    } else {
+      navigate('/register');
+    }
   };
 
   const shareResult = () => {
@@ -316,7 +345,11 @@ export default function AssessmentPage() {
               <div className="md:hidden absolute top-0 bottom-0 left-[34px] w-1 bg-gradient-to-b from-[#00f0ff] to-[#b026ff] z-0"></div>
 
               <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between w-full gap-6 md:gap-3 lg:gap-4 px-4 md:px-8">
-                {(aiRoadmaps[0].modules || []).map((stepDesc, idx) => {
+                {(aiRoadmaps[0].modules || []).map((moduleData, idx) => {
+                  // Fallback for older string-based formats if needed
+                  const stepName = typeof moduleData === 'object' ? moduleData.name : moduleData;
+                  const stepTech = typeof moduleData === 'object' ? moduleData.tech : "";
+
                   const isBottom = idx % 2 !== 0;
                   const colorClass = isBottom ? 'text-[#b026ff] border-[#b026ff]' : 'text-[#00f0ff] border-[#00f0ff]';
                   const bgClass = isBottom ? 'bg-[#b026ff]' : 'bg-[#00f0ff]';
@@ -335,7 +368,8 @@ export default function AssessmentPage() {
                       {/* Card Mobile */}
                       <div className={`md:hidden w-full bg-[#15161c] rounded-xl p-4 shadow-xl border-l-4 ${colorClass}`}>
                         <div className={`text-[10px] uppercase font-bold mb-1 ${isBottom ? 'text-[#b026ff]' : 'text-[#00f0ff]'}`}>Step {idx + 1}</div>
-                        <div className="text-[14px] leading-snug">{stepDesc}</div>
+                        <div className="text-[14px] leading-snug font-bold">{stepName}</div>
+                        {stepTech && <div className="text-[12px] text-[#8a8d9b] mt-1 break-words">{stepTech}</div>}
                       </div>
 
                       {/* Desktop Layout */}
@@ -344,7 +378,8 @@ export default function AssessmentPage() {
                           <>
                             <div className={`w-full bg-[#15161c] rounded-xl p-3 shadow-xl border-t-2 border-l-[1px] border-r-[1px] border-b-[1px] border-b-white/5 border-l-white/10 border-r-white/5 ${colorClass} hover:shadow-[0_0_15px_rgba(0,240,255,0.2)] transition-shadow`}>
                               <div className={`text-[10px] uppercase tracking-wider font-bold mb-1 text-[#00f0ff]`}>Step {idx + 1}</div>
-                              <div className="text-[13px] leading-tight">{stepDesc}</div>
+                              <div className="text-[13px] leading-tight font-bold">{stepName}</div>
+                              {stepTech && <div className="text-[11px] text-[#8a8d9b] mt-1 break-words">{stepTech}</div>}
                             </div>
                             <div className={`w-[2px] h-[30px] ${bgClass}`}></div>
                           </>
@@ -353,7 +388,8 @@ export default function AssessmentPage() {
                             <div className={`w-[2px] h-[30px] ${bgClass}`}></div>
                             <div className={`w-full bg-[#15161c] rounded-xl p-3 shadow-xl border-b-2 border-l-[1px] border-r-[1px] border-t-[1px] border-t-white/5 border-l-white/10 border-r-white/5 ${colorClass} hover:shadow-[0_0_15px_rgba(176,38,255,0.2)] transition-shadow`}>
                               <div className={`text-[10px] uppercase tracking-wider font-bold mb-1 text-[#b026ff]`}>Step {idx + 1}</div>
-                              <div className="text-[13px] leading-tight">{stepDesc}</div>
+                              <div className="text-[13px] leading-tight font-bold">{stepName}</div>
+                              {stepTech && <div className="text-[11px] text-[#8a8d9b] mt-1 break-words">{stepTech}</div>}
                             </div>
                           </>
                         )}
@@ -371,11 +407,15 @@ export default function AssessmentPage() {
               <h3 className="text-xl font-bold mb-6 text-center text-[#8a8d9b]">Optional Alternative Paths</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {aiRoadmaps.slice(1).map((roadmap, idx) => (
-                  <div key={idx} className="bg-[#15161c] border border-white/10 rounded-xl p-5 hover:border-white/30 transition-colors">
+                  <div 
+                    key={idx} 
+                    onClick={() => handleAlternativeClick(idx + 1)}
+                    className="bg-[#15161c] border border-white/10 rounded-xl p-5 hover:border-[#00f0ff]/50 hover:bg-[#00f0ff]/5 cursor-pointer transition-all duration-300 transform hover:-translate-y-1"
+                  >
                     <h4 className="text-lg font-bold text-[#00f0ff] mb-2">{roadmap.title}</h4>
                     <p className="text-sm text-[#8a8d9b] mb-4">{roadmap.description}</p>
                     <div className="text-xs text-white/70">
-                      <strong>Modules:</strong> {roadmap.modules?.join(" → ")}
+                      <strong>Key Topics:</strong> {roadmap.modules?.map(m => typeof m === 'object' ? m.name : m).join(" → ")}
                     </div>
                   </div>
                 ))}
@@ -384,12 +424,12 @@ export default function AssessmentPage() {
           )}
 
           <div className="flex flex-wrap justify-center gap-4 mb-4">
-            <Link
-              to="/register"
+            <button
+              onClick={handleSaveClick}
               className="flex items-center justify-center gap-2 bg-gradient-to-r from-[#00f0ff] to-[#b026ff] text-white font-bold py-3 px-8 rounded-full hover:-translate-y-1 transition-all shadow-[0_4px_15px_rgba(176,38,255,0.3)]"
             >
-              Create an Account
-            </Link>
+              {user ? 'Save to My Learning' : 'Create an Account'}
+            </button>
             <button
               onClick={shareResult}
               className="flex items-center gap-2 bg-transparent border-2 border-[#00f0ff] text-[#00f0ff] hover:bg-[#00f0ff]/10 font-bold py-3 px-8 rounded-full transition-all"
@@ -402,6 +442,12 @@ export default function AssessmentPage() {
             >
               <RefreshCw className="w-5 h-5" /> Retake
             </button>
+            <Link
+              to="/"
+              className="flex items-center justify-center gap-2 bg-transparent border-2 border-[#b026ff] text-[#b026ff] hover:bg-[#b026ff]/10 font-bold py-3 px-8 rounded-full hover:-translate-y-1 transition-all"
+            >
+              Continue as Guest
+            </Link>
           </div>
         </div>
       )}

@@ -3,6 +3,7 @@ const Enrollment = require("../models/enrollment.model");
 const LessonProgress = require("../models/lessonProgress.model");
 const Lesson = require("../models/lesson.model");
 const Module = require("../models/module.model");
+const User = require("../models/user.model");
 
 exports.getAllRoadmaps = async ({ page = 1, limit = 10, search = "", difficulty = "" }) => {
   const query = { is_public: true };
@@ -51,6 +52,9 @@ exports.recalculateProgress = async (userId, roadmapId) => {
     completed: true,
   });
 
+  const existingEnrollment = await Enrollment.findOne({ user_id: userId, roadmap_id: roadmapId });
+  const wasAlreadyCompleted = existingEnrollment?.status === "completed";
+
   const progress = Math.round((completed / totalLessons) * 100);
   const status = progress === 100 ? "completed" : progress > 0 ? "in_progress" : "enrolled";
 
@@ -58,4 +62,26 @@ exports.recalculateProgress = async (userId, roadmapId) => {
     { user_id: userId, roadmap_id: roadmapId },
     { progress, status, ...(status === "completed" && { completed_at: new Date() }) }
   );
+
+  // Trigger n8n webhook if newly completed
+  if (status === "completed" && !wasAlreadyCompleted) {
+    try {
+      const user = await User.findById(userId);
+      const roadmap = await Roadmap.findById(roadmapId);
+      if (user && roadmap) {
+        fetch("http://n8n:5678/webhook/roadmap-completed", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: user.email,
+            name: user.full_name,
+            roadmap_title: roadmap.title,
+            completed_at: new Date().toISOString()
+          })
+        }).catch(err => console.error("Webhook trigger failed:", err.message));
+      }
+    } catch (error) {
+      console.error("Error triggering completion webhook:", error);
+    }
+  }
 };
