@@ -212,8 +212,8 @@
 
 /* Hero Section */
 .hero {
-  padding-top: 100px;
-  /* Reduced to fit screen */
+  padding-top: 160px;
+  /* Increased to create a premium gap below the navbar */
   padding-bottom: var(--spacing-8);
   position: relative;
   z-index: 10;
@@ -230,6 +230,7 @@
 }
 
 .hero h1 {
+  font-family: 'Z17strength_bold', 'Walone', 'Irrawaddy', 'Poppins', 'Noto Sans Myanmar', sans-serif;
   font-size: 64px;
   /* Reduced slightly */
   font-weight: 700;
@@ -293,6 +294,38 @@
   display: flex;
   gap: var(--spacing-6);
   justify-content: center;
+}
+
+/* Floating Animations for CTA Buttons */
+.btn-vibe {
+  --base-offset: -20px;
+  animation: floatButton 4s ease-in-out infinite;
+  padding: 20px 42px;
+  font-size: 18px;
+}
+
+.btn-explore-cta {
+  --base-offset: 0px;
+  animation: floatButton 4s ease-in-out infinite;
+  animation-delay: 0.8s;
+  padding: 20px 42px;
+  font-size: 18px;
+}
+
+@keyframes floatButton {
+  0%, 100% {
+    transform: translateY(var(--base-offset));
+  }
+  50% {
+    transform: translateY(calc(var(--base-offset) - 10px));
+  }
+}
+
+.btn-vibe:hover,
+.btn-explore-cta:hover {
+  animation-play-state: paused;
+  filter: brightness(1.1);
+  box-shadow: 0 10px 25px rgba(139, 92, 246, 0.3);
 }
 
 .divider {
@@ -558,8 +591,8 @@
   }
 
   .btn-dark {
-    padding: 12px 16px;
-    font-size: 14px;
+    padding: 14px 24px;
+    font-size: 16px;
   }
 
   .explore-header h2 {

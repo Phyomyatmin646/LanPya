@@ -80,8 +80,8 @@ export default function LandingPage() {
       {/* Hero Section */}
       <header className="hero">
         <div className="hero-content">
-          <h1>We're Here To Help</h1>
-          <p className="subheading">AI-Powered Digital Learning</p>
+          <h1>Digital ခေတ်ထဲလမ်းပျောက်နေလား</h1>
+          <p className="subheading">ဝါသနာတွေကနေဝင်ငွေလမ်းကြောင်းဖော်ဆောင်ပေးမယ့် လမ်းပြ</p>
 
           {/* Static Hero Image (Robot + Icons) */}
           <div className="hero-image-wrapper">
@@ -91,11 +91,11 @@ export default function LandingPage() {
           </div>
 
           <div className="hero-ctas">
-            <Link to="/assessment" className="btn btn-dark">
+            <Link to="/assessment" className="btn btn-dark btn-vibe">
               ဝါသနာကို ရှာဖွေပါ
               <svg className="arrow lime-arrow" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
             </Link>
-            <Link to="/assessment" className="btn btn-dark">
+            <Link to="/assessment" className="btn btn-dark btn-explore-cta">
               စိတ်ဝင်စားတာလေ့လာမယ်
               <svg className="arrow amber-arrow" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
             </Link>
@@ -108,7 +108,7 @@ export default function LandingPage() {
       <section className="py-12 relative overflow-hidden bg-[#060608] px-4 sm:px-6">
         {/* Glow Effects */}
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-purple-900/10 blur-[120px] rounded-full pointer-events-none" />
-        
+
         <div className="max-w-6xl mx-auto relative z-10">
           {/* Header */}
           <div className="text-center max-w-3xl mx-auto mb-10">

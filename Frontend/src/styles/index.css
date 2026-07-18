@@ -45,6 +45,16 @@
   unicode-range: U+1000-109F;
 }
 
+@font-face {
+  font-family: 'Z17strength_bold';
+  src: url('/fonts/Z17Strength-Bold.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-007F, U+1000-109F, U+2000-2BFF;
+}
+
+
 
 @tailwind base;
 @tailwind components;
