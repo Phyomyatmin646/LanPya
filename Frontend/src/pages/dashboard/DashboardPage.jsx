@@ -122,25 +122,58 @@ function StatCard({ label, value, icon: Icon, iconColor, extra }) {
 function RoadmapCard({ roadmap }) {
   const diff = DIFF_LABELS[roadmap.difficulty] || DIFF_LABELS.beginner;
   const href = `/roadmaps/${roadmap._id}`;
+  const hasThumbnail = !!roadmap.thumbnail;
   const imgSrc = roadmap.thumbnail || getCategoryImage(roadmap);
+
+  const lessonCount = roadmap.lesson_count || roadmap.modules?.reduce((n, m) => n + (m.lesson_count || 0), 0) || 0;
+
+  if (hasThumbnail) {
+    return (
+      <Link to={href} className="lp-course-card group block relative w-full overflow-hidden rounded-[20px] transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_12px_30px_rgba(113,48,225,0.24)]">
+        {/* The PNG Card in its original ratio */}
+        <img src={imgSrc} alt={roadmap.title} className="w-full h-auto block group-hover:scale-105 transition-transform duration-500" loading="lazy" />
+        
+        {/* Gradient overlay to ensure text readability */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#100727]/90 via-[#100727]/20 to-transparent pointer-events-none transition-opacity duration-300 group-hover:opacity-100" />
+
+        <div className="absolute inset-0 p-4 flex flex-col justify-between z-10">
+          {/* Top-left: Difficulty Level */}
+          <div>
+            <span className="lp-level">
+              {diff.label}
+            </span>
+          </div>
+
+          {/* Bottom Data */}
+          <div className="mt-auto">
+            <h4 className="font-bold text-white text-[16px] leading-tight line-clamp-2 mb-1 drop-shadow-md">{roadmap.title}</h4>
+            <p className="text-[12px] text-white/80 line-clamp-1 mb-3 drop-shadow-md">{roadmap.category_id?.name || diff.label}</p>
+            <div className="flex items-center justify-between text-[11px] text-white/90 border-t border-white/20 pt-3">
+              <span className="flex items-center gap-1.5"><Play className="w-3.5 h-3.5 text-[#a974ff]" fill="currentColor" /> {lessonCount} Lessons</span>
+              <span className="flex items-center gap-1.5"><Award className="w-3.5 h-3.5 text-[#a974ff]" /> Certified</span>
+            </div>
+          </div>
+        </div>
+      </Link>
+    );
+  }
 
   return (
     <Link to={href} className="lp-course-card group block">
-      <div className="relative h-36 overflow-hidden">
-        <img src={imgSrc} alt={roadmap.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#100727] via-[#100727]/20 to-transparent" />
+      <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-[#3E276D] to-[#100727] flex items-center justify-center p-4">
+        <div className="text-center">
+          <span className="text-4xl mb-2 block">{roadmap.category_id?.icon || '🗺️'}</span>
+          <h4 className="font-bold text-white text-[16px] leading-tight line-clamp-2">{roadmap.title}</h4>
+        </div>
         <span className="lp-level absolute top-3 left-3">
           {diff.label}
         </span>
-        <div className="absolute top-3 right-3 flex gap-1">
-          <i /><i /><i />
-        </div>
       </div>
-      <div className="p-4 pt-3">
-        <h4 className="font-bold text-white text-[17px] leading-tight line-clamp-2 min-h-[42px]">{roadmap.title}</h4>
+      <div className="p-4 pt-3 bg-[#100727]">
+        <h4 className="font-bold text-white text-[15px] leading-tight line-clamp-1">{roadmap.title}</h4>
         <p className="text-[12px] text-[#a974ff] line-clamp-1 mt-0.5 mb-3">{roadmap.category_id?.name || diff.label}</p>
         <div className="flex items-center gap-3 text-[11px] text-white/65 border-t border-white/10 pt-3 mb-3">
-          <span className="flex items-center gap-1.5"><Play className="w-3.5 h-3.5 text-[#9d55ff]" /> {roadmap.lesson_count || roadmap.modules?.reduce((n, m) => n + (m.lesson_count || 0), 0) || 0} Lessons</span>
+          <span className="flex items-center gap-1.5"><Play className="w-3.5 h-3.5 text-[#9d55ff]" /> {lessonCount} Lessons</span>
           <span className="h-4 w-px bg-white/15" />
           <span className="flex items-center gap-1.5"><Award className="w-3.5 h-3.5 text-[#9d55ff]" /> Certified</span>
         </div>
@@ -152,26 +185,59 @@ function RoadmapCard({ roadmap }) {
 
 // ── Skill Card (from categories-with-roadmaps) ─────────────────
 function SkillCard({ skill }) {
+  const hasThumbnail = !!skill.roadmap?.thumbnail;
   const imgSrc = skill.roadmap?.thumbnail || getCategoryImage({ name: skill.name });
   const hasRoadmap = !!skill.roadmap;
   const totalLessons = skill.roadmap?.modules?.reduce((acc, m) => acc + (m.lesson_count || 0), 0) || 0;
   const href = hasRoadmap ? `/roadmaps/${skill.roadmap._id}` : '#';
 
+  if (hasThumbnail) {
+    return (
+      <Link to={href} className="lp-course-card group block relative w-full overflow-hidden rounded-[20px] transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_12px_30px_rgba(113,48,225,0.24)]">
+        {/* The PNG Card in its original ratio */}
+        <img src={imgSrc} alt={skill.name} className="w-full h-auto block group-hover:scale-105 transition-transform duration-500" loading="lazy" />
+        
+        {/* Gradient overlay to ensure text readability */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#100727]/90 via-[#100727]/20 to-transparent pointer-events-none transition-opacity duration-300 group-hover:opacity-100" />
+
+        <div className="absolute inset-0 p-4 flex flex-col justify-between z-10">
+          {/* Top-left status badge */}
+          <div>
+            <span className="lp-level">
+              {hasRoadmap ? 'BEGINNER' : 'SOON'}
+            </span>
+          </div>
+
+          {/* Bottom Data overlays */}
+          <div className="mt-auto">
+            <h4 className="font-bold text-white text-[16px] leading-tight line-clamp-2 mb-1 drop-shadow-md">{skill.name}</h4>
+            <p className="text-[12px] text-white/80 line-clamp-1 mb-3 drop-shadow-md">{hasRoadmap ? 'Start Learning' : 'Coming Soon'}</p>
+            <div className="flex items-center justify-between text-[11px] text-white/90 border-t border-white/20 pt-3">
+              <span className="flex items-center gap-1.5"><Play className="w-3.5 h-3.5 text-[#a974ff]" fill="currentColor" /> {totalLessons || '—'} Lessons</span>
+              <span className="flex items-center gap-1.5"><Award className="w-3.5 h-3.5 text-[#a974ff]" /> Certified</span>
+            </div>
+          </div>
+        </div>
+      </Link>
+    );
+  }
+
   return (
     <Link to={href} className="lp-course-card group block">
-      <div className="relative h-36 overflow-hidden">
-        <img src={imgSrc} alt={skill.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#100727] via-[#100727]/20 to-transparent" />
+      <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-[#3E276D] to-[#100727] flex items-center justify-center p-4">
+        <div className="text-center">
+          <span className="text-4xl mb-2 block">🗺️</span>
+          <h4 className="font-bold text-white text-[16px] leading-tight line-clamp-2">{skill.name}</h4>
+        </div>
         <span className="lp-level absolute top-3 left-3">{hasRoadmap ? 'BEGINNER' : 'SOON'}</span>
-        <div className="absolute top-3 right-3 flex gap-1"><i /><i /><i /></div>
       </div>
-      <div className="p-4 pt-3">
-        <h4 className="font-bold text-white text-[17px] leading-tight line-clamp-2 min-h-[42px]">{skill.name}</h4>
-        <p className="text-[12px] text-[#a974ff] line-clamp-1 mt-0.5 mb-3">(design story)</p>
+      <div className="p-4 pt-3 bg-[#100727]">
+        <h4 className="font-bold text-white text-[15px] leading-tight line-clamp-1">{skill.name}</h4>
+        <p className="text-[12px] text-[#a974ff] line-clamp-1 mt-0.5 mb-3">{hasRoadmap ? 'Start Learning' : 'Coming Soon'}</p>
         <div className="flex items-center gap-3 text-[11px] text-white/65 border-t border-white/10 pt-3 mb-3">
           <span className="flex items-center gap-1.5"><Play className="w-3.5 h-3.5 text-[#9d55ff]" /> {totalLessons || '—'} Lessons</span>
           <span className="h-4 w-px bg-white/15" />
-          <span className="flex items-center gap-1.5"><Award className="w-3.5 h-3.5 text-[#9d55ff]" /> 1 Certified</span>
+          <span className="flex items-center gap-1.5"><Award className="w-3.5 h-3.5 text-[#9d55ff]" /> Certified</span>
         </div>
         <div className="lp-cta"><span>{hasRoadmap ? 'View Now' : 'Coming Soon'}</span><ArrowRight className="w-4 h-4" /></div>
       </div>
