@@ -2,7 +2,9 @@
 FROM node:20-alpine AS base
 WORKDIR /app
 COPY package*.json ./
-RUN npm install && npm cache clean --force
+# --include=dev ensures vite and other devDependencies are installed
+# regardless of NODE_ENV (important for development containers)
+RUN npm install --include=dev && npm cache clean --force
 COPY . .
 
 # ─── Development ─────────────────────────────────────────────
