@@ -13,7 +13,10 @@ const { toolDefinitions, executeTool } = require("./ai.tools");
  */
 exports.chatWithAI = async (userMessage, history = [], context = {}, res = null) => {
   try {
-    const systemPrompt = process.env.AI_SYSTEM_PROMPT || "You are a helpful AI.";
+    let systemPrompt = process.env.AI_SYSTEM_PROMPT || "You are a helpful AI.";
+    if (!systemPrompt.includes('YouTube search links')) {
+      systemPrompt += " - If the user asks about courses or lessons related to their roadmap or learning steps, recommend relevant courses by providing YouTube search links in this format: [Watch Course on YouTube](https://www.youtube.com/results?search_query=Learn+[Topic]+full+course).";
+    }
     
     // Fetch recent negative feedbacks for this user to inject as "mistakes to avoid"
     const ChatHistory = require("../models/chatHistory.model");

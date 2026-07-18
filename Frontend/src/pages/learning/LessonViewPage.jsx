@@ -3,11 +3,13 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { roadmapService } from '../../services/roadmapService';
 import { progressService } from '../../services/enrollmentService';
-import { FileText, CheckCircle, Circle, ChevronLeft, MessageSquare, PlayCircle, FileDown, Lock } from 'lucide-react';
+import { FileText, CheckCircle, Circle, ChevronLeft, MessageSquare, PlayCircle, FileDown, Lock, GraduationCap } from 'lucide-react';
 import { Skeleton } from '../../components/ui/Skeleton';
 import { toast } from 'react-hot-toast';
 import ChatComponent from '../chat/ChatComponent';
 import { useAuth } from '../../hooks/useAuth';
+import { quizService } from '../../services/quizService';
+import { QuizModal } from '../../components/quiz/QuizModal';
 
 // ── Helpers ───────────────────────────────────────────────────
 function getEmbedUrl(url) {
@@ -74,10 +76,11 @@ function VideoPlayer({ resource, user, onSignupPrompt }) {
 
 export default function LessonViewPage() {
   const { id, lessonId } = useParams();
-  const queryClient = useQueryClient();
   const [showAi, setShowAi] = useState(false);
+  const [showQuiz, setShowQuiz] = useState(false);
   const { user } = useAuth();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   // Fetch roadmap modules to build the sidebar tree
   const { data: modulesResponse, isLoading: modulesLoading } = useQuery({
@@ -95,6 +98,14 @@ export default function LessonViewPage() {
   const { data: resourcesResponse } = useQuery({
     queryKey: ['lesson', lessonId, 'resources'],
     queryFn: () => roadmapService.getLessonResources(lessonId),
+    enabled: !!lessonId,
+  });
+
+  const { data: quizResponse } = useQuery({
+    queryKey: ['quiz', lessonId],
+    queryFn: () => quizService.getQuizByLesson(lessonId),
+    enabled: !!lessonId,
+    retry: false
   });
 
   const markCompleteMutation = useMutation({
@@ -212,12 +223,23 @@ export default function LessonViewPage() {
                   )}
                 </button>
                 <button 
-                  onClick={() => user ? markCompleteMutation.mutate() : handleRestrictedAction('save progress')}
+                  onClick={() => {
+                    if (!user) return handleRestrictedAction('save progress');
+                    if (quizResponse?.data?.data?.quiz) {
+                      setShowQuiz(true);
+                    } else {
+                      markCompleteMutation.mutate();
+                    }
+                  }}
                   disabled={user && markCompleteMutation.isPending}
                   className="btn btn-primary gap-2"
                 >
                   {user ? (
-                    <><CheckCircle className="w-4 h-4" /> {markCompleteMutation.isPending ? 'Saving...' : 'Complete'}</>
+                    quizResponse?.data?.data?.quiz ? (
+                      <><GraduationCap className="w-4 h-4" /> Take Quiz to Complete</>
+                    ) : (
+                      <><CheckCircle className="w-4 h-4" /> {markCompleteMutation.isPending ? 'Saving...' : 'Complete'}</>
+                    )
                   ) : (
                     <><Lock className="w-4 h-4" /> Complete</>
                   )}
@@ -295,10 +317,20 @@ export default function LessonViewPage() {
             </button>
           </div>
           <div className="flex-1 overflow-y-auto">
-            <ChatComponent embedded />
+            <ChatComponent contextData={lesson} />
           </div>
         </div>
       )}
+
+      <QuizModal 
+        isOpen={showQuiz}
+        onClose={() => setShowQuiz(false)}
+        quizData={quizResponse?.data?.data}
+        onSuccess={() => {
+          setShowQuiz(false);
+          markCompleteMutation.mutate();
+        }}
+      />
     </div>
   );
-}
+};

@@ -563,12 +563,16 @@ function AuthDashboard({ user }) {
 // ── Main Page ─────────────────────────────────────────────────
 export default function DashboardPage() {
   const { user } = useAuth();
-  const { generatedRoadmap, assessmentAnswers, isGuest } = useGuestStore();
+  const { savedAiRoadmaps, generatedRoadmap, assessmentAnswers, isGuest } = useGuestStore();
 
-  const showGuestDashboard = !user && isGuest && generatedRoadmap;
+  const activeRoadmap = (savedAiRoadmaps && savedAiRoadmaps.length > 0) 
+    ? savedAiRoadmaps[savedAiRoadmaps.length - 1] 
+    : generatedRoadmap;
+
+  const showGuestDashboard = !user && isGuest && activeRoadmap;
 
   if (showGuestDashboard) {
-    return <GuestDashboard assessmentAnswers={assessmentAnswers} generatedRoadmap={generatedRoadmap} />;
+    return <GuestDashboard assessmentAnswers={assessmentAnswers} generatedRoadmap={activeRoadmap} />;
   }
   return <AuthDashboard user={user || { username: 'guest', full_name: 'Guest', avatar: '' }} />;
 }

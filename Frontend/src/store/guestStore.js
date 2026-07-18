@@ -6,11 +6,22 @@ export const useGuestStore = create(
     (set) => ({
       isGuest: true,
       assessmentAnswers: null,
-      generatedRoadmap: null,
+      savedAiRoadmaps: [],
       setGuestData: (answers, roadmap) => 
-        set({ isGuest: true, assessmentAnswers: answers, generatedRoadmap: roadmap }),
+        set((state) => {
+          const newRoadmap = { ...roadmap, _id: `custom-ai-${Date.now()}` };
+          // Ensure backwards compatibility if generatedRoadmap exists from old state
+          const existing = Array.isArray(state.savedAiRoadmaps) 
+            ? state.savedAiRoadmaps 
+            : (state.generatedRoadmap ? [state.generatedRoadmap] : []);
+          return {
+            isGuest: true,
+            assessmentAnswers: answers,
+            savedAiRoadmaps: [...existing, newRoadmap]
+          };
+        }),
       clearGuestData: () => 
-        set({ isGuest: false, assessmentAnswers: null, generatedRoadmap: null }),
+        set({ isGuest: false, assessmentAnswers: null, savedAiRoadmaps: [] }),
     }),
     {
       name: 'lanpya-guest-storage',
