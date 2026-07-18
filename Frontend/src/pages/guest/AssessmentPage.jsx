@@ -5,137 +5,138 @@ import { toast } from 'react-hot-toast';
 
 const questions = [
   {
-    q: "A friend asks you to help with their birthday party invite. What's most fun?",
+    q: "သူငယ်ချင်းတစ်ယောက်က မွေးနေ့ပွဲဖိတ်စာလုပ်ဖို့ အကူအညီတောင်းရင် ဘယ်အရာက သင့်အတွက် အပျော်ဆုံးဖြစ်မလဲ။",
     options: [
-      { text: "Picking colors, fonts, and layout to make it look great", track: "Graphic Design" },
-      { text: "Making a short video invite with music and transitions", track: "Video Editing" },
-      { text: "Writing a catchy caption/story to hype it up", track: "Content Creation" },
-      { text: "Setting up an online RSVP page", track: "WebDev" }
+      { text: "လှပအောင် အရောင်၊ ဖောင့်နဲ့ ပုံစံ (layout) ရွေးချယ်တာ", track: "Graphic Design" },
+      { text: "သီချင်းနဲ့ animation ပါတဲ့ ဖိတ်စာဗီဒီယိုတိုလေး လုပ်တာ", track: "Video Editing" },
+      { text: "လူစိတ်ဝင်စားအောင် စာသားဆွဲဆောင်မှုရှိရှိ ရေးတာ", track: "Content Creation" },
+      { text: "Online ကနေ စာရင်းပေးလို့ရမယ့် page တစ်ခု ဖန်တီးတာ", track: "WebDev" }
     ]
   },
   {
-    q: "You see an app with a confusing menu. Your first instinct?",
+    q: "အသုံးပြုရခက်ခဲပြီး ရှုပ်ထွေးနေတဲ့ App တစ်ခုကို တွေ့ရင် သင့်ရဲ့ ပထမဆုံးအတွေးက ဘာဖြစ်မလဲ။",
     options: [
-      { text: "I could redesign this to be way easier to use", track: "UI/UX Design" },
-      { text: "I bet I could fix this with some code", track: "Programming" },
-      { text: "What if this leaks people's data? That's risky", track: "Cybersecurity" },
-      { text: "I'd make a post explaining how to actually use it", track: "Content Creation" }
+      { text: "သုံးရပိုလွယ်အောင် ပုံစံအသစ် (redesign) ပြန်ဆွဲချင်တယ်", track: "UI/UX Design" },
+      { text: "Code ရေးပြီး ဒါကို ပြင်လိုက်လို့ရတယ်လို့ တွေးမိတယ်", track: "Programming" },
+      { text: "အချက်အလက်တွေ ပေါက်ကြားသွားမလားလို့ စိုးရိမ်မိတယ်", track: "Cybersecurity" },
+      { text: "ဒါကို ဘယ်လိုသုံးရမလဲဆိုတာ ရှင်းပြတဲ့ content လုပ်ချင်တယ်", track: "Content Creation" }
     ]
   },
   {
-    q: "Your dream project is...",
+    q: "သင် အလုပ်ချင်ဆုံး စိတ်ကူးယဉ် Project က ဘာလဲ။",
     options: [
-      { text: "Building a full website for a small business", track: "WebDev" },
-      { text: "Writing a program that solves a daily problem", track: "Programming" },
-      { text: "Automating boring tasks using AI tools", track: "AI Skills" },
-      { text: "Creating AI-generated art, music, or video", track: "Generative AI" }
+      { text: "လုပ်ငန်းတစ်ခုအတွက် Website အပြည့်အစုံ ဆွဲပေးတာ", track: "WebDev" },
+      { text: "နေ့စဉ်ပြဿနာတွေကို ဖြေရှင်းပေးမယ့် software/app ရေးတာ", track: "Programming" },
+      { text: "ပျင်းစရာကောင်းတဲ့ အလုပ်တွေကို AI နဲ့ အလိုအလျောက်လုပ်ခိုင်းတာ", track: "AI Skills" },
+      { text: "AI သုံးပြီး ပုံတွေ၊ သီချင်းတွေ၊ ဗီဒီယိုတွေ ဖန်တီးတာ", track: "Generative AI" }
     ]
   },
   {
-    q: "Which YouTube video would you click first?",
+    q: "YouTube ပေါ်မှာဆိုရင် ဘယ်ဗီဒီယိုကို အရင်ဆုံး နှိပ်ကြည့်မလဲ။",
     options: [
-      { text: "Photoshop tricks that changed my design career", track: "Graphic Design" },
-      { text: "How hackers break into websites", track: "Cybersecurity" },
-      { text: "I built a business using ChatGPT", track: "AI Skills" },
-      { text: "Editing tricks that make videos go viral", track: "Video Editing" }
+      { text: "ဒီဇိုင်းလောကကို ပြောင်းလဲစေမယ့် Photoshop နည်းလမ်းများ", track: "Graphic Design" },
+      { text: "Hacker တွေ Website တွေကို ဘယ်လိုဖောက်ထွင်းလဲ", track: "Cybersecurity" },
+      { text: "ChatGPT သုံးပြီး ကိုယ်ပိုင်လုပ်ငန်းတစ်ခု ဘယ်လိုထောင်မလဲ", track: "AI Skills" },
+      { text: "ဗီဒီယိုတွေ လူကြည့်များစေမယ့် ဗီဒီယိုတည်းဖြတ်နည်းများ", track: "Video Editing" }
     ]
   },
   {
-    q: "In a group project, you'd naturally take the role of...",
+    q: "အဖွဲ့လိုက် အလုပ်တစ်ခုလုပ်ရင် သင်က ဘယ်အပိုင်းကို ပိုလုပ်ချင်လဲ။",
     options: [
-      { text: "The one making eye-catching visuals/thumbnails", track: "Graphic Design" },
-      { text: "The one filming and editing the final video", track: "Video Editing" },
-      { text: "The one writing the script and hook", track: "Content Creation" },
-      { text: "The one running the ad campaign to get views", track: "Digital Marketing" }
+      { text: "လှပတဲ့ ဓာတ်ပုံနဲ့ ပုံရိပ်တွေ ပြင်ဆင်ပေးတဲ့သူ", track: "Graphic Design" },
+      { text: "ဗီဒီယိုရိုက်ကူးပြီး တည်းဖြတ်ပေးတဲ့သူ", track: "Video Editing" },
+      { text: "စာသားတွေ၊ ဇာတ်ညွှန်းတွေ ရေးသားပေးတဲ့သူ", track: "Content Creation" },
+      { text: "လူသိများအောင် ကြော်ငြာ (Ads) တွေ လုပ်ပေးတဲ့သူ", track: "Digital Marketing" }
     ]
   },
   {
-    q: "Which sounds most satisfying to master?",
+    q: "ဘယ်ပညာရပ်ကို ကျွမ်းကျင်အောင် သင်ယူရတာက သင့်အတွက် အားရကျေနပ်မှုအရှိဆုံး ဖြစ်မလဲ။",
     options: [
-      { text: "Making an app feel intuitive to use", track: "UI/UX Design" },
-      { text: "Getting a website to rank #1 on Google", track: "Digital Marketing" },
-      { text: "Prompting AI to generate exactly what you imagine", track: "Generative AI" },
-      { text: "Finding security holes before hackers do", track: "Cybersecurity" }
+      { text: "App တစ်ခုကို သုံးရတာ အလွန်လွယ်ကူပြီး စမတ်ကျအောင် လုပ်တာ", track: "UI/UX Design" },
+      { text: "Website ကို Google ရှာဖွေမှုရဲ့ ထိပ်ဆုံးမှာ ရောက်အောင်လုပ်တာ (SEO)", track: "Digital Marketing" },
+      { text: "မိမိစိတ်ကူးထဲကအတိုင်း ထွက်လာဖို့ AI ကို အမိန့်ပေးခိုင်းစေတာ", track: "Generative AI" },
+      { text: "Hacker တွေထက် အရင် လုံခြုံရေးအားနည်းချက်ကို ရှာဖွေပြင်ဆင်တာ", track: "Cybersecurity" }
     ]
   },
   {
-    q: "A weekend paid gig — you'd pick...",
+    q: "ပိတ်ရက်မှာ အခကြေးငွေရမယ့် Freelance အလုပ်တစ်ခု လုပ်မယ်ဆိုရင် ဘာကို ရွေးမလဲ။",
     options: [
-      { text: "Designing a logo and brand identity", track: "Graphic Design" },
-      { text: "Building a landing page with code", track: "WebDev" },
-      { text: "Editing a client's YouTube video", track: "Video Editing" },
-      { text: "Running their Instagram ads", track: "Digital Marketing" }
+      { text: "လုပ်ငန်းတစ်ခုအတွက် Logo နဲ့ Brand ဒီဇိုင်းဆွဲပေးတာ", track: "Graphic Design" },
+      { text: "Code ရေးပြီး Website/Landing Page တစ်ခု ဖန်တီးပေးတာ", track: "WebDev" },
+      { text: "Client ရဲ့ YouTube ဗီဒီယိုကို တည်းဖြတ်ပေးတာ", track: "Video Editing" },
+      { text: "သူတို့ရဲ့ လူမှုကွန်ရက် ကြော်ငြာ (Ads) တွေကို ဦးစီးလုပ်ကိုင်ပေးတာ", track: "Digital Marketing" }
     ]
   },
   {
-    q: "What excites you most about AI?",
-    options: [{ text: "Using it to automate business tasks", track: "AI Skills" },
-    { text: "Using it to generate images, video, or music", track: "Generative AI" },
-    { text: "Using it to write code faster", track: "Programming" },
-    { text: "Making sure AI isn't hacked or misused", track: "Cybersecurity" }
+    q: "AI နဲ့ ပတ်သက်ပြီး သင့်ကို အစိတ်လှုပ်ရှားစေဆုံးအရာက ဘာလဲ။",
+    options: [
+      { text: "အလုပ်ကိစ္စတွေကို AI သုံးပြီး အလိုအလျောက် မြန်မြန်ဆန်ဆန်လုပ်တာ", track: "AI Skills" },
+      { text: "ပုံတွေ၊ ဗီဒီယိုတွေ၊ သီချင်းတွေကို AI သုံးပြီး အလွယ်တကူ ထုတ်လုပ်တာ", track: "Generative AI" },
+      { text: "Code ရေးရာမှာ မြန်ဆန်စေဖို့ AI ကို အကူအညီတောင်းတာ", track: "Programming" },
+      { text: "AI ကို တလွဲအသုံးမပြုအောင်နဲ့ အဟက်မခံရအောင် ကာကွယ်တာ", track: "Cybersecurity" }
     ]
   },
   {
-    q: "Pick a 'superpower' for a day:",
+    q: "တစ်ရက်တာအတွက် အစွမ်းထက်စွမ်းရည် (superpower) တစ်ခု ရမယ်ဆိုရင် ဘာကို ရွေးမလဲ။",
     options: [
-      { text: "Instantly know how to code any app", track: "Programming" },
-      { text: "Instantly create any image you imagine", track: "Generative AI" },
-      { text: "Instantly design any professional graphic", track: "Graphic Design" },
-      { text: "Instantly know how any system could be attacked or protected", track: "Cybersecurity" }
+      { text: "ဘယ်လို App မျိုးမဆို ချက်ချင်း Code ရေးနိုင်တဲ့ စွမ်းရည်", track: "Programming" },
+      { text: "စိတ်ကူးထဲရှိသမျှပုံတွေကို ချက်ချင်းဖန်တီးနိုင်တဲ့ စွမ်းရည်", track: "Generative AI" },
+      { text: "ပရော်ဖက်ရှင်နယ်ကျတဲ့ ဒီဇိုင်းတွေကို ချက်ချင်းဆွဲနိုင်တဲ့ စွမ်းရည်", track: "Graphic Design" },
+      { text: "စနစ်တစ်ခုရဲ့ လုံခြုံရေး အားနည်းချက်ကို ချက်ချင်းသိပြီး ကာကွယ်နိုင်တဲ့ စွမ်းရည်", track: "Cybersecurity" }
     ]
   },
   {
-    q: "You just learned something cool. You'd rather...",
+    q: "စိတ်ဝင်စားစရာ အသစ်တစ်ခုခု သိလာတဲ့အခါ ဘယ်လို မျှဝေချင်လဲ။",
     options: [
-      { text: "Make a short-form video about it", track: "Content Creation" },
-      { text: "Write a blog/newsletter about it", track: "Digital Marketing" },
-      { text: "Make an infographic explaining it", track: "Graphic Design" },
-      { text: "Build a mini webpage about it", track: "WebDev" }
+      { text: "အကြောင်းအရာနဲ့ ပတ်သက်ပြီး ဗီဒီယိုတိုလေး လုပ်ပြီး တင်ချင်တယ်", track: "Content Creation" },
+      { text: "ဆောင်းပါး သို့မဟုတ် Newsletter ရေးပြီး မျှဝေချင်တယ်", track: "Digital Marketing" },
+      { text: "နားလည်လွယ်တဲ့ ပုံလေးတွေ (infographic) ဆွဲပြီး ရှင်းပြချင်တယ်", track: "Graphic Design" },
+      { text: "ဒီအကြောင်းအရာအတွက် သီးသန့် Web page လေးတစ်ခု လုပ်ချင်တယ်", track: "WebDev" }
     ]
   },
   {
-    q: "What would bother you most while using an app?",
+    q: "App တစ်ခုကို သုံးနေရင်း ဘယ်အချက်က သင့်ကို အနှောင့်အယှက်အဖြစ်ဆုံးလဲ။",
     options: [
-      { text: "Ugly, hard-to-read layout", track: "UI/UX Design" },
-      { text: "Broken buttons or links", track: "Programming" },
-      { text: "Feeling like your data isn't safe", track: "Cybersecurity" },
-      { text: "Boring content with no visuals", track: "Content Creation" }
+      { text: "ကြည့်ရဆိုးပြီး ဖတ်ရခက်တဲ့ ဒီဇိုင်းပုံစံ", track: "UI/UX Design" },
+      { text: "နှိပ်လို့မရတဲ့ ခလုတ်တွေ သို့မဟုတ် ပျက်နေတဲ့ လင့်ခ်များ", track: "Programming" },
+      { text: "ကိုယ့်ရဲ့ ကိုယ်ရေးကိုယ်တာ အချက်အလက်တွေ မလုံခြုံသလို ခံစားရတာ", track: "Cybersecurity" },
+      { text: "ရုပ်ပုံတွေ မပါဘဲ ပျင်းစရာကောင်းတဲ့ စာသားသက်သက် content တွေ", track: "Content Creation" }
     ]
   },
   {
-    q: "Your ideal 'flow state' activity is...",
+    q: "အချိန်ကုန်မှန်းမသိ စိတ်နှစ်ပြီး လုပ်ရတာ အနှစ်သက်ဆုံး အလုပ်က ဘာလဲ။",
     options: [
-      { text: "Editing clips until the pacing feels perfect", track: "Video Editing" },
-      { text: "Solving a logic puzzle or debugging code", track: "Programming" },
-      { text: "Sketching layouts and picking color palettes", track: "Graphic Design" },
-      { text: "Brainstorming with AI to generate ideas", track: "AI Skills" }
+      { text: "ဗီဒီယိုအကွက်တွေကို စည်းချက်ကျကျ တည်းဖြတ်နေရတာ", track: "Video Editing" },
+      { text: "Code ထဲက အမှား (Bug) တွေကို ရှာဖွေဖြေရှင်းနေရတာ", track: "Programming" },
+      { text: "ဒီဇိုင်းပုံကြမ်းတွေဆွဲပြီး အရောင်စပ်နေရတာ", track: "Graphic Design" },
+      { text: "စိတ်ကူးသစ်တွေရဖို့ AI နဲ့ တိုင်ပင်ဆွေးနွေးနေရတာ", track: "AI Skills" }
     ]
   },
   {
-    q: "Which job title interests you most?",
+    q: "ဘယ်အလုပ်ရာထူးကို ပိုပြီး စိတ်ဝင်စားလဲ။",
     options: [
-      { text: "Freelance Web Developer", track: "WebDev" },
-      { text: "Social Media Manager", track: "Digital Marketing" },
-      { text: "Cybersecurity Analyst", track: "Cybersecurity" },
-      { text: "Content Creator / YouTuber", track: "Content Creation" }
+      { text: "Freelance Web Developer (Website ရေးဆွဲသူ)", track: "WebDev" },
+      { text: "Social Media Manager (လူမှုကွန်ရက် စီမံခန့်ခွဲသူ)", track: "Digital Marketing" },
+      { text: "Cybersecurity Analyst (စနစ်လုံခြုံရေးပညာရှင်)", track: "Cybersecurity" },
+      { text: "Content Creator / YouTuber (ဗီဒီယိုဖန်တီးသူ)", track: "Content Creation" }
     ]
   },
   {
-    q: "What would you build for a hackathon demo?",
+    q: "Hackathon ပြိုင်ပွဲတစ်ခုမှာဆိုရင် ဘယ်အပိုင်းကို အဓိက ဖန်တီးတင်ပြမလဲ။",
     options: [
-      { text: "A working prototype with a clean interface", track: "UI/UX Design" },
-      { text: "An AI tool that auto-generates content", track: "Generative AI" },
-      { text: "A short promo video for the product", track: "Video Editing" },
-      { text: "A marketing plan to launch it", track: "Digital Marketing" }
+      { text: "အသုံးပြုရ လွယ်ကူသပ်ရပ်တဲ့ သရုပ်ပြပုံစံ (prototype) တည်ဆောက်တာ", track: "UI/UX Design" },
+      { text: "Content တွေကို အလိုအလျောက် ထုတ်လုပ်ပေးမယ့် AI ကိရိယာ ဖန်တီးတာ", track: "Generative AI" },
+      { text: "ထုတ်ကုန်ကို မိတ်ဆက်ပေးမယ့် ကြော်ငြာဗီဒီယိုတို ဖန်တီးတာ", track: "Video Editing" },
+      { text: "ဈေးကွက်ထဲကို စတင်မိတ်ဆက်ဖို့ ဈေးကွက်မြှင့်တင်ရေး (Marketing) အစီအစဉ်ဆွဲတာ", track: "Digital Marketing" }
     ]
   },
   {
-    q: "Which compliment means the most to you?",
+    q: "ဘယ်လို ချီးကျူးစကားမျိုးက သင့်အတွက် တန်ဖိုးအရှိဆုံး ဖြစ်မလဲ။",
     options: [
-      { text: "Your designs always look so professional", track: "Graphic Design" },
-      { text: "You explain things so clearly, I love your content", track: "Content Creation" },
-      { text: "Your code actually works flawlessly", track: "Programming" },
-      { text: "I feel safe because you protect our data", track: "Cybersecurity" }
+      { text: "မင်းရဲ့ဒီဇိုင်းတွေက တကယ့်ကို professional ကျတာပဲ", track: "Graphic Design" },
+      { text: "မင်းရှင်းပြတာ အရမ်းနားလည်လွယ်တယ်၊ မင်းရဲ့ content ကို ကြိုက်တယ်", track: "Content Creation" },
+      { text: "မင်းရေးထားတဲ့ code က အမှားအယွင်းမရှိ အလုပ်လုပ်တာပဲ", track: "Programming" },
+      { text: "မင်းက အချက်အလက်တွေကို ကာကွယ်ပေးလို့ ငါတို့လုံခြုံတယ်လို့ ခံစားရတယ်", track: "Cybersecurity" }
     ]
   }
 ];
