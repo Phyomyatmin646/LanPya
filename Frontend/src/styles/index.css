@@ -25,7 +25,7 @@
   }
 
   body {
-    @apply bg-[#F6F8FA] text-[#1F2328] font-sans antialiased;
+    @apply bg-[#090516] text-white font-sans antialiased;
   }
 
   /* Typography */
@@ -36,6 +36,45 @@
   h5,
   h6 {
     @apply font-semibold tracking-tight;
+  }
+}
+
+/* LanPya learning surface — tuned to the purple card reference UI. */
+@layer components {
+  .lp-course-card {
+    @apply overflow-hidden rounded-[20px] border border-[#3c2c6d] bg-[#100727] transition-all duration-200;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.04), 0 12px 28px rgba(0,0,0,.18);
+  }
+
+  .lp-course-card:hover {
+    @apply -translate-y-1 border-[#8d50ff];
+    box-shadow: 0 12px 30px rgba(113, 48, 225, .24), inset 0 1px 0 rgba(255,255,255,.08);
+  }
+
+  .lp-course-card img {
+    filter: saturate(.9) brightness(.78);
+  }
+
+  .lp-level {
+    @apply rounded-full bg-gradient-to-r from-[#7a2cff] to-[#a64dff] px-3 py-1 text-[10px] font-semibold tracking-wide text-white;
+    box-shadow: 0 4px 12px rgba(131, 46, 255, .35);
+  }
+
+  .lp-course-card i {
+    @apply block h-2.5 w-2.5 rounded-full bg-[#963fff];
+    box-shadow: 0 0 8px rgba(150,63,255,.7);
+  }
+
+  .lp-cta {
+    @apply flex items-center justify-between rounded-xl bg-gradient-to-r from-[#1d0e50] to-[#291265] px-3 py-2.5 text-sm font-semibold text-white transition-colors;
+  }
+
+  .lp-cta svg {
+    @apply rounded-full bg-[#8a36f5] p-1 text-white;
+  }
+
+  .lp-course-card:hover .lp-cta {
+    @apply from-[#28106b] to-[#3c168d];
   }
 }
 

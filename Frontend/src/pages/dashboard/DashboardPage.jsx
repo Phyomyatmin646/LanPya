@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { miscService } from '../../services/miscService';
+import { roadmapService } from '../../services/roadmapService';
 import { useAuth } from '../../hooks/useAuth';
 import { useGuestStore } from '../../store/guestStore';
 import {
   BookOpen, Activity, Star, Info, TrendingUp, Trophy,
   Medal, Sparkles, ArrowRight, Users, ChevronRight, Zap,
-  CheckCircle, Award, Flame, MessageSquare, Play, Clock
+  CheckCircle, Award, Flame, MessageSquare, Play, Clock,
+  Layers
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Skeleton } from '../../components/ui/Skeleton';
@@ -18,27 +20,49 @@ import { Avatar } from '../../components/ui/Avatar';
 // White         : #FFFFFF
 // Near-black    : #1F1F1F
 
+// ── Category icon map ─────────────────────────────────────────
+const CATEGORY_ICONS = {
+  'Foundation Skills':     '💻',
+  'Graphic Design Skills': '🎨',
+  'Web':                   '🌐',
+  'Video Editing':         '🎬',
+  'Marketing':             '📢',
+  'Content Creation':      '✍️',
+  'AI Skills':             '🤖',
+  'Data Analyst Skills':   '📊',
+  'Cybersecurity':         '🔐',
+  'Freelancing & Career':  '💼',
+};
+
 // ── Unsplash images for roadmap cards ─────────────────────────
 const CARD_IMAGES = {
-  'web development':  'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=400&h=250&fit=crop&q=80',
-  'fullstack':        'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=400&h=250&fit=crop&q=80',
-  'full stack':       'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=400&h=250&fit=crop&q=80',
-  'frontend':         'https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=400&h=250&fit=crop&q=80',
-  'react':            'https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=400&h=250&fit=crop&q=80',
-  'typescript':       'https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=400&h=250&fit=crop&q=80',
-  'backend':          'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?w=400&h=250&fit=crop&q=80',
+  'web':              'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=400&h=250&fit=crop&q=80',
+  'html':             'https://images.unsplash.com/photo-1621839673705-6617adf9e890?w=400&h=250&fit=crop&q=80',
+  'css':              'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=250&fit=crop&q=80',
+  'javascript':       'https://images.unsplash.com/photo-1579468118864-1b9ea3c0db4a?w=400&h=250&fit=crop&q=80',
   'node':             'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?w=400&h=250&fit=crop&q=80',
-  'api':              'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?w=400&h=250&fit=crop&q=80',
-  'express':          'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?w=400&h=250&fit=crop&q=80',
-  'devops':           'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=400&h=250&fit=crop&q=80',
-  'cloud':            'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=400&h=250&fit=crop&q=80',
-  'docker':           'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=400&h=250&fit=crop&q=80',
-  'ai & ml':          'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=400&h=250&fit=crop&q=80',
-  'machine learning': 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=400&h=250&fit=crop&q=80',
-  'artificial':       'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=400&h=250&fit=crop&q=80',
-  'data science':     'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&h=250&fit=crop&q=80',
+  'laravel':          'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=400&h=250&fit=crop&q=80',
+  'php':              'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=400&h=250&fit=crop&q=80',
+  'database':         'https://images.unsplash.com/photo-1544383835-bda2bc66a55d?w=400&h=250&fit=crop&q=80',
   'python':           'https://images.unsplash.com/photo-1526379095098-d400fd0bf935?w=400&h=250&fit=crop&q=80',
+  'photoshop':        'https://images.unsplash.com/photo-1609921212029-bb5a28e60960?w=400&h=250&fit=crop&q=80',
+  'design':           'https://images.unsplash.com/photo-1626785774573-4b799315345d?w=400&h=250&fit=crop&q=80',
+  'video':            'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=400&h=250&fit=crop&q=80',
+  'capcut':           'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=400&h=250&fit=crop&q=80',
+  'premiere':         'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=400&h=250&fit=crop&q=80',
+  'davinci':          'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=400&h=250&fit=crop&q=80',
+  'excel':            'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=250&fit=crop&q=80',
+  'word':             'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=400&h=250&fit=crop&q=80',
+  'powerpoint':       'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=250&fit=crop&q=80',
+  'google':           'https://images.unsplash.com/photo-1573804633927-bfcbcd909acd?w=400&h=250&fit=crop&q=80',
+  'computer':         'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=400&h=250&fit=crop&q=80',
+  'internet':         'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=400&h=250&fit=crop&q=80',
+  'marketing':        'https://images.unsplash.com/photo-1533750516457-a7f992034fec?w=400&h=250&fit=crop&q=80',
+  'ai':               'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=400&h=250&fit=crop&q=80',
   'data':             'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&h=250&fit=crop&q=80',
+  'security':         'https://images.unsplash.com/photo-1563986768494-4dee2763ff3f?w=400&h=250&fit=crop&q=80',
+  'freelanc':         'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=400&h=250&fit=crop&q=80',
+  'hosting':          'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=400&h=250&fit=crop&q=80',
 };
 
 const FALLBACK_IMAGES = [
@@ -50,40 +74,19 @@ const FALLBACK_IMAGES = [
   'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=400&h=250&fit=crop&q=80',
 ];
 
-function getCategoryImage(roadmap) {
+function getCategoryImage(item) {
   const haystack = [
-    roadmap.title || '',
-    roadmap.category_id?.name || '',
-    roadmap.description || '',
+    item.title || item.name || '',
+    item.category_id?.name || '',
+    item.description || '',
   ].join(' ').toLowerCase();
 
   for (const [key, img] of Object.entries(CARD_IMAGES)) {
     if (haystack.includes(key)) return img;
   }
-  const hash = [...(roadmap.title || 'x')].reduce((a, c) => a + c.charCodeAt(0), 0);
+  const hash = [...(item.title || item.name || 'x')].reduce((a, c) => a + c.charCodeAt(0), 0);
   return FALLBACK_IMAGES[hash % FALLBACK_IMAGES.length];
 }
-
-// ── Mock data ─────────────────────────────────────────────────
-const MOCK_ROADMAPS = [
-  { _id: 'mock-1', title: 'Full Stack Web Dev', description: 'Master both frontend and backend development with React, Node.js, and PostgreSQL from scratch to production.', difficulty: 'primary', enrollment_count: 1243, category_id: { name: 'Web Development' }, isMock: true },
-  { _id: 'mock-2', title: 'Machine Learning', description: 'Learn the core concepts of ML including supervised learning, neural networks, and model deployment with Python.', difficulty: 'advanced', enrollment_count: 987, category_id: { name: 'AI & ML' }, isMock: true },
-  { _id: 'mock-3', title: 'DevOps & Cloud Engineering', description: 'Docker, Kubernetes, CI/CD pipelines, and AWS deployment strategies for modern software delivery.', difficulty: 'primary', enrollment_count: 754, category_id: { name: 'DevOps' }, isMock: true },
-  { _id: 'mock-4', title: 'React & TypeScript Mastery', description: 'Build scalable, type-safe React applications with TypeScript, custom hooks, and state management.', difficulty: 'intermediate', enrollment_count: 1102, category_id: { name: 'Frontend' }, isMock: true },
-  { _id: 'mock-5', title: 'Backend with Node.js & Express', description: 'REST APIs, authentication, database design, and microservices architecture with Node.js.', difficulty: 'intermediate', enrollment_count: 892, category_id: { name: 'Backend' }, isMock: true },
-  { _id: 'mock-6', title: 'Python for Data Science', description: 'Pandas, NumPy, data visualization, and statistical analysis for aspiring data scientists.', difficulty: 'advanced', enrollment_count: 1560, category_id: { name: 'Data Science' }, isMock: true },
-];
-
-const MOCK_LEADERBOARD = [
-  { rank: 1, username: 'aungsiphyo',   full_name: 'Aung Si Phyo',    completed_lessons: 142, avatar: '' },
-  { rank: 2, username: 'zawmyolatt',   full_name: 'Zaw Myo Latt',    completed_lessons: 118, avatar: '' },
-  { rank: 3, username: 'naylinoo',     full_name: 'Nay Lin Oo',      completed_lessons: 97,  avatar: '' },
-  { rank: 4, username: 'thidarwin',    full_name: 'Thidar Win',       completed_lessons: 83,  avatar: '' },
-  { rank: 5, username: 'kyawzinthant', full_name: 'Kyaw Zin Thant',  completed_lessons: 76,  avatar: '' },
-  { rank: 6, username: 'eindrakyaw',   full_name: 'Eindra Kyaw',     completed_lessons: 65,  avatar: '' },
-  { rank: 7, username: 'phyomyat',     full_name: 'Phyo Myat Min',   completed_lessons: 58,  avatar: '' },
-  { rank: 8, username: 'linlinn',      full_name: 'Lin Lin',          completed_lessons: 47,  avatar: '' },
-];
 
 const MOCK_ACTIVITY = [
   { id: 1, icon: CheckCircle, color: 'text-emerald-400', text: 'Finished Lesson 4 in Python', user: 'Aung Si Phyo', time: '2 hours ago' },
@@ -115,29 +118,62 @@ function StatCard({ label, value, icon: Icon, iconColor, extra }) {
   );
 }
 
-// ── Roadmap Card ──────────────────────────────────────────────
+// ── Roadmap Card (from trending/recommendations) ───────────────
 function RoadmapCard({ roadmap }) {
   const diff = DIFF_LABELS[roadmap.difficulty] || DIFF_LABELS.beginner;
-  const href = roadmap.isMock ? '/explore' : `/roadmaps/${roadmap._id}`;
-  const imgSrc = getCategoryImage(roadmap);
+  const href = `/roadmaps/${roadmap._id}`;
+  const imgSrc = roadmap.thumbnail || getCategoryImage(roadmap);
 
   return (
-    <Link to={href} className="group block rounded-2xl overflow-hidden bg-[#2a2a2e] border border-white/5 hover:border-[#8955F3]/50 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg">
-      {/* Image */}
-      <div className="relative h-32 overflow-hidden">
+    <Link to={href} className="lp-course-card group block">
+      <div className="relative h-36 overflow-hidden">
         <img src={imgSrc} alt={roadmap.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#2a2a2e] via-transparent to-transparent" />
-        <span className={`absolute top-2.5 right-2.5 text-[9px] font-bold px-2 py-0.5 rounded-md ${diff.bg} ${diff.text} tracking-wider`}>
+        <div className="absolute inset-0 bg-gradient-to-t from-[#100727] via-[#100727]/20 to-transparent" />
+        <span className="lp-level absolute top-3 left-3">
           {diff.label}
         </span>
+        <div className="absolute top-3 right-3 flex gap-1">
+          <i /><i /><i />
+        </div>
       </div>
-      {/* Content */}
-      <div className="p-4">
-        <h4 className="font-semibold text-white text-sm mb-1 line-clamp-1">{roadmap.title}</h4>
-        <p className="text-[11px] text-white/40 line-clamp-2 mb-3 leading-relaxed">{roadmap.description}</p>
-        <button className="w-full text-center text-xs font-semibold text-[#8955F3] border border-[#8955F3]/30 rounded-lg py-2 hover:bg-[#8955F3]/10 transition-colors">
-          View Path
-        </button>
+      <div className="p-4 pt-3">
+        <h4 className="font-bold text-white text-[17px] leading-tight line-clamp-2 min-h-[42px]">{roadmap.title}</h4>
+        <p className="text-[12px] text-[#a974ff] line-clamp-1 mt-0.5 mb-3">{roadmap.category_id?.name || diff.label}</p>
+        <div className="flex items-center gap-3 text-[11px] text-white/65 border-t border-white/10 pt-3 mb-3">
+          <span className="flex items-center gap-1.5"><Play className="w-3.5 h-3.5 text-[#9d55ff]" /> {roadmap.lesson_count || roadmap.modules?.reduce((n, m) => n + (m.lesson_count || 0), 0) || 0} Lessons</span>
+          <span className="h-4 w-px bg-white/15" />
+          <span className="flex items-center gap-1.5"><Award className="w-3.5 h-3.5 text-[#9d55ff]" /> Certified</span>
+        </div>
+        <div className="lp-cta"><span>View Now</span><ArrowRight className="w-4 h-4" /></div>
+      </div>
+    </Link>
+  );
+}
+
+// ── Skill Card (from categories-with-roadmaps) ─────────────────
+function SkillCard({ skill }) {
+  const imgSrc = skill.roadmap?.thumbnail || getCategoryImage({ name: skill.name });
+  const hasRoadmap = !!skill.roadmap;
+  const totalLessons = skill.roadmap?.modules?.reduce((acc, m) => acc + (m.lesson_count || 0), 0) || 0;
+  const href = hasRoadmap ? `/roadmaps/${skill.roadmap._id}` : '#';
+
+  return (
+    <Link to={href} className="lp-course-card group block">
+      <div className="relative h-36 overflow-hidden">
+        <img src={imgSrc} alt={skill.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#100727] via-[#100727]/20 to-transparent" />
+        <span className="lp-level absolute top-3 left-3">{hasRoadmap ? 'BEGINNER' : 'SOON'}</span>
+        <div className="absolute top-3 right-3 flex gap-1"><i /><i /><i /></div>
+      </div>
+      <div className="p-4 pt-3">
+        <h4 className="font-bold text-white text-[17px] leading-tight line-clamp-2 min-h-[42px]">{skill.name}</h4>
+        <p className="text-[12px] text-[#a974ff] line-clamp-1 mt-0.5 mb-3">(design story)</p>
+        <div className="flex items-center gap-3 text-[11px] text-white/65 border-t border-white/10 pt-3 mb-3">
+          <span className="flex items-center gap-1.5"><Play className="w-3.5 h-3.5 text-[#9d55ff]" /> {totalLessons || '—'} Lessons</span>
+          <span className="h-4 w-px bg-white/15" />
+          <span className="flex items-center gap-1.5"><Award className="w-3.5 h-3.5 text-[#9d55ff]" /> 1 Certified</span>
+        </div>
+        <div className="lp-cta"><span>{hasRoadmap ? 'View Now' : 'Coming Soon'}</span><ArrowRight className="w-4 h-4" /></div>
       </div>
     </Link>
   );
@@ -168,10 +204,8 @@ function LeaderboardPodium({ entries }) {
   const top3 = entries.slice(0, 3);
   if (top3.length < 3) return null;
 
-  // Reorder: 2nd, 1st, 3rd for visual podium
   const ordered = [top3[1], top3[0], top3[2]];
   const heights = ['h-16', 'h-24', 'h-12'];
-  const positions = ['2nd', '1st', '3rd'];
   const colors = ['bg-gray-400', 'bg-amber-400', 'bg-orange-600'];
 
   return (
@@ -212,41 +246,95 @@ function LeaderboardList({ entries }) {
 }
 
 // ── Shared data hook ──────────────────────────────────────────
-function useDiscoveryData(interests = []) {
-  const { data: recsResponse, isLoading: recsLoading } = useQuery({
-    queryKey: ['recommendations', interests.join(',')],
-    queryFn: () => miscService.getGuestRecommendations(interests.length > 0 ? interests : ['programming'], 6),
-  });
+function useDiscoveryData() {
   const { data: trendingResponse, isLoading: trendingLoading } = useQuery({
     queryKey: ['trending-roadmaps'],
     queryFn: () => miscService.getTrendingRoadmaps(6),
+    staleTime: 5 * 60 * 1000,
   });
   const { data: leaderboardResponse, isLoading: lbLoading } = useQuery({
     queryKey: ['leaderboard'],
     queryFn: () => miscService.getLeaderboard(10),
+    staleTime: 5 * 60 * 1000,
+  });
+  const { data: categoriesResponse, isLoading: catsLoading } = useQuery({
+    queryKey: ['categories-with-roadmaps'],
+    queryFn: () => roadmapService.getCategoriesWithRoadmaps(),
+    staleTime: 10 * 60 * 1000,
   });
 
-  const apiRecs     = recsResponse?.data?.data || [];
-  const apiTrending = trendingResponse?.data?.data || [];
-  const apiLb       = leaderboardResponse?.data?.data || [];
+  const trending    = trendingResponse?.data?.data || [];
+  const leaderboard = leaderboardResponse?.data?.data || [];
+  const categories  = categoriesResponse?.data?.data || [];
 
   return {
-    roadmaps:    apiRecs.length     > 0 ? apiRecs     : MOCK_ROADMAPS,
-    trending:    apiTrending.length > 0 ? apiTrending : MOCK_ROADMAPS.slice().reverse(),
-    leaderboard: apiLb.length       > 0 ? apiLb       : MOCK_LEADERBOARD,
-    recsLoading,
+    trending,
+    leaderboard,
+    categories,
     trendingLoading,
     lbLoading,
+    catsLoading,
   };
+}
+
+// ── Categories + Skills Section ──────────────────────────────
+function CategoriesSection({ categories, catsLoading }) {
+  const [activeCategory, setActiveCategory] = useState(null);
+
+  const displayCats = categories.slice(0, 10);
+  const initialCategory = categories.find(c => c.name === 'Graphic Design Skills') || categories[0];
+  const activeCat = activeCategory
+    ? categories.find(c => c._id === activeCategory)
+    : initialCategory;
+
+  const skills = activeCat?.skills || [];
+
+  if (catsLoading) {
+    return (
+      <div>
+        <div className="flex gap-2 mb-4 overflow-x-auto pb-2">
+          {[...Array(6)].map((_, i) => <Skeleton key={i} className="h-8 w-24 rounded-xl opacity-20 shrink-0" />)}
+        </div>
+        <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-3">
+          {[...Array(6)].map((_, i) => <Skeleton key={i} className="h-36 rounded-2xl opacity-20" />)}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      {/* Category tabs */}
+      <div className="flex gap-2 mb-5 overflow-x-auto pb-2 scrollbar-hide">
+        {displayCats.map(cat => (
+          <button
+            key={cat._id}
+            onClick={() => setActiveCategory(cat._id)}
+            className={`shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all whitespace-nowrap ${
+                (activeCategory ? activeCategory === cat._id : initialCategory?._id === cat._id)
+                ? 'bg-gradient-to-r from-[#7a32f2] to-[#9b4dff] text-white shadow-[0_0_16px_rgba(137,85,243,.35)]'
+                : 'bg-white/5 text-white/50 hover:bg-white/10 hover:text-white'
+            }`}
+          >
+            <span>{CATEGORY_ICONS[cat.name] || '📌'}</span>
+            {cat.name}
+          </button>
+        ))}
+      </div>
+      {/* Skills grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {skills.map(skill => <SkillCard key={skill._id} skill={skill} />)}
+      </div>
+    </div>
+  );
 }
 
 // ── Guest Dashboard ───────────────────────────────────────────
 function GuestDashboard({ assessmentAnswers, generatedRoadmap }) {
-  const interests = assessmentAnswers?.interests || [];
-  const { roadmaps, trending, leaderboard, recsLoading, trendingLoading, lbLoading } = useDiscoveryData(interests);
+  const { trending, leaderboard, categories, trendingLoading, lbLoading, catsLoading } = useDiscoveryData();
 
   return (
-    <div className="min-h-screen bg-[#1F1F1F]">
+    <div className="min-h-screen bg-[#090516]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8">
 
         {/* Guest banner */}
@@ -264,45 +352,37 @@ function GuestDashboard({ assessmentAnswers, generatedRoadmap }) {
         </div>
 
         {/* Hero */}
-        <div className="rounded-2xl bg-[#2a2a2e] border border-white/5 p-6 md:p-8">
-          <div className="inline-flex items-center gap-2 bg-[#8955F3]/15 border border-[#8955F3]/30 rounded-full px-4 py-1.5 mb-4">
-            <Sparkles className="w-3.5 h-3.5 text-[#8955F3]" />
-            <span className="text-xs font-medium text-[#8955F3]">AI-Generated Roadmap Ready</span>
+        {generatedRoadmap && (
+          <div className="rounded-2xl bg-[#2a2a2e] border border-white/5 p-6 md:p-8">
+            <div className="inline-flex items-center gap-2 bg-[#8955F3]/15 border border-[#8955F3]/30 rounded-full px-4 py-1.5 mb-4">
+              <Sparkles className="w-3.5 h-3.5 text-[#8955F3]" />
+              <span className="text-xs font-medium text-[#8955F3]">AI-Generated Roadmap Ready</span>
+            </div>
+            <h1 className="text-2xl md:text-4xl font-bold text-white mb-2">{generatedRoadmap?.title}</h1>
+            <p className="text-white/50 text-sm mb-5 max-w-2xl">{generatedRoadmap?.description}</p>
+            <div className="flex gap-3">
+              <Link to="/register" className="inline-flex items-center gap-2 bg-[#8955F3] hover:bg-[#7340e0] text-white font-semibold text-sm px-5 py-2.5 rounded-xl transition-all">
+                <Zap className="w-4 h-4" /> Create Free Account
+              </Link>
+              <Link to="/explore" className="inline-flex items-center gap-2 border border-white/15 text-white/70 hover:text-white text-sm px-5 py-2.5 rounded-xl transition-all">
+                Browse All
+              </Link>
+            </div>
           </div>
-          <h1 className="text-2xl md:text-4xl font-bold text-white mb-2">{generatedRoadmap?.title}</h1>
-          <p className="text-white/50 text-sm mb-5 max-w-2xl">{generatedRoadmap?.description}</p>
-          <div className="flex flex-wrap gap-2 mb-6">
-            {assessmentAnswers?.goal && <span className="bg-white/10 text-white/70 text-xs px-3 py-1 rounded-full">🎯 {assessmentAnswers.goal}</span>}
-            {assessmentAnswers?.currentLevel && <span className="bg-white/10 text-white/70 text-xs px-3 py-1 rounded-full">📊 {assessmentAnswers.currentLevel}</span>}
-            {interests.map(i => <span key={i} className="bg-[#8955F3]/15 text-[#8955F3] text-xs px-3 py-1 rounded-full border border-[#8955F3]/20">{i}</span>)}
-          </div>
-          <div className="flex gap-3">
-            <Link to="/register" className="inline-flex items-center gap-2 bg-[#8955F3] hover:bg-[#7340e0] text-white font-semibold text-sm px-5 py-2.5 rounded-xl transition-all">
-              <Zap className="w-4 h-4" /> Create Free Account
-            </Link>
-            <Link to="/explore" className="inline-flex items-center gap-2 border border-white/15 text-white/70 hover:text-white text-sm px-5 py-2.5 rounded-xl transition-all">
-              Browse All
-            </Link>
-          </div>
-        </div>
+        )}
 
-        {/* Curated for You */}
+        {/* Browse Skills by Category */}
         <div>
           <div className="flex items-center justify-between mb-5">
-            <h2 className="text-lg font-bold text-white">Curated for You</h2>
+            <div className="flex items-center gap-2">
+              <Layers className="w-5 h-5 text-[#8955F3]" />
+              <h2 className="text-lg font-bold text-white">Browse Skills</h2>
+            </div>
             <Link to="/explore" className="text-sm text-[#8955F3] hover:text-[#a47cf5] flex items-center gap-1 transition-colors">
               View all <ChevronRight className="w-4 h-4" />
             </Link>
           </div>
-          {recsLoading ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-              {[...Array(6)].map((_, i) => <Skeleton key={i} className="h-56 rounded-2xl opacity-20" />)}
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-              {roadmaps.map(r => <RoadmapCard key={r._id} roadmap={r} />)}
-            </div>
-          )}
+          <CategoriesSection categories={categories} catsLoading={catsLoading} />
         </div>
 
         {/* Trending */}
@@ -317,48 +397,43 @@ function GuestDashboard({ assessmentAnswers, generatedRoadmap }) {
             </Link>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-            {(trendingLoading ? [...Array(6)] : trending).map((r, i) =>
+            {(trendingLoading ? [...Array(6)] : trending.slice(0, 6)).map((r, i) =>
               trendingLoading ? <Skeleton key={i} className="h-56 rounded-2xl opacity-20" /> : <RoadmapCard key={r._id} roadmap={r} />
             )}
           </div>
         </div>
 
         {/* Leaderboard */}
-        <div>
-          <div className="flex items-center gap-2 mb-5">
-            <Trophy className="w-5 h-5 text-amber-400" />
-            <h2 className="text-lg font-bold text-white">Leaderboard</h2>
-            <span className="text-xs text-white/30">Top Learners</span>
+        {leaderboard.length > 0 && (
+          <div>
+            <div className="flex items-center gap-2 mb-5">
+              <Trophy className="w-5 h-5 text-amber-400" />
+              <h2 className="text-lg font-bold text-white">Leaderboard</h2>
+              <span className="text-xs text-white/30">Top Learners</span>
+            </div>
+            <div className="rounded-2xl bg-[#2a2a2e] border border-white/5 overflow-hidden">
+              <LeaderboardPodium entries={leaderboard} />
+              <LeaderboardList entries={leaderboard} />
+              <div className="px-4 py-3 border-t border-white/5">
+                <Link to="/register" className="text-xs text-[#8955F3] hover:text-[#a47cf5] font-medium flex items-center gap-1">
+                  Join and climb the leaderboard <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+            </div>
           </div>
-          <div className="rounded-2xl bg-[#2a2a2e] border border-white/5 overflow-hidden">
-            {lbLoading ? (
-              <div className="p-4 space-y-3">{[...Array(5)].map((_, i) => <Skeleton key={i} className="h-10 w-full opacity-20" />)}</div>
-            ) : (
-              <>
-                <LeaderboardPodium entries={leaderboard} />
-                <LeaderboardList entries={leaderboard} />
-                <div className="px-4 py-3 border-t border-white/5">
-                  <Link to="/register" className="text-xs text-[#8955F3] hover:text-[#a47cf5] font-medium flex items-center gap-1">
-                    Join and climb the leaderboard <ArrowRight className="w-3.5 h-3.5" />
-                  </Link>
-                </div>
-              </>
-            )}
-          </div>
-        </div>
+        )}
 
       </div>
     </div>
   );
 }
 
-// ── Auth Dashboard (matches reference design) ─────────────────
-function AuthDashboard({ user, assessmentAnswers }) {
-  const interests = assessmentAnswers?.interests || [];
-  const { roadmaps, trending, leaderboard, recsLoading, trendingLoading, lbLoading } = useDiscoveryData(interests);
+// ── Auth Dashboard ─────────────────────────────────────────────
+function AuthDashboard({ user }) {
+  const { trending, leaderboard, categories, trendingLoading, lbLoading, catsLoading } = useDiscoveryData();
 
   return (
-    <div className="min-h-screen bg-[#1F1F1F]">
+    <div className="min-h-screen bg-[#090516]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
 
         {/* Welcome header */}
@@ -395,25 +470,17 @@ function AuthDashboard({ user, assessmentAnswers }) {
           <div className="lg:col-span-4">
             <div className="rounded-2xl bg-[#2a2a2e] border border-white/5 p-5 h-full">
               <h3 className="text-sm font-bold text-white mb-4">My Current Path & Next Lesson</h3>
-
               <div className="rounded-xl bg-gradient-to-br from-[#3E276D] to-[#2a1a50] border border-[#8955F3]/30 p-4 mb-4">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-xs font-semibold text-white/80">Full Stack Web Dev</span>
                   <span className="text-[9px] font-bold px-2 py-0.5 rounded bg-[#8955F3] text-white">PRIMARY</span>
                 </div>
-                {/* Progress bar */}
                 <div className="h-1.5 bg-white/10 rounded-full overflow-hidden mb-3">
                   <div className="h-full bg-[#8955F3] rounded-full w-[65%]" />
                 </div>
                 <button className="w-full text-left text-xs font-medium text-[#8955F3] bg-[#8955F3]/15 border border-[#8955F3]/30 rounded-lg px-3 py-2 hover:bg-[#8955F3]/25 transition-colors flex items-center gap-2">
-                  <Play className="w-3 h-3" /> Continue Learning: React Hooks →
+                  <Play className="w-3 h-3" /> Continue Learning →
                 </button>
-              </div>
-
-              <div className="flex flex-wrap gap-2">
-                {['Python', 'Intermediate', 'Advanced'].map(t => (
-                  <span key={t} className="text-[10px] text-white/40 border border-white/10 rounded-full px-2.5 py-1">{t}</span>
-                ))}
               </div>
             </div>
           </div>
@@ -430,7 +497,6 @@ function AuthDashboard({ user, assessmentAnswers }) {
 
           {/* Right: AI + Leaderboard */}
           <div className="lg:col-span-4 space-y-4">
-            {/* Featured AI */}
             <div className="rounded-2xl bg-gradient-to-br from-[#3E276D] to-[#2a1a50] border border-[#8955F3]/30 p-5">
               <h3 className="text-sm font-bold text-white mb-1">Featured AI Interaction</h3>
               <p className="text-xs text-white/40 mb-3">Chat with AI to find your next skill.</p>
@@ -438,42 +504,55 @@ function AuthDashboard({ user, assessmentAnswers }) {
                 <MessageSquare className="w-3.5 h-3.5" /> Chat your Learning →
               </Link>
             </div>
-
-            {/* Leaderboard */}
             <div className="rounded-2xl bg-[#2a2a2e] border border-white/5 overflow-hidden">
               <div className="px-5 pt-4 pb-2">
                 <h3 className="text-sm font-bold text-white">Leaderboard</h3>
-                <p className="text-[10px] text-white/30">Top {Math.min(leaderboard.length, 3)} Learners</p>
+                <p className="text-[10px] text-white/30">Top Learners</p>
               </div>
               {lbLoading ? (
                 <div className="p-4 space-y-2">{[...Array(3)].map((_, i) => <Skeleton key={i} className="h-8 w-full opacity-20" />)}</div>
-              ) : (
+              ) : leaderboard.length >= 3 ? (
                 <>
                   <LeaderboardPodium entries={leaderboard} />
                   <LeaderboardList entries={leaderboard} />
                 </>
+              ) : (
+                <p className="text-xs text-white/30 px-5 pb-4">No entries yet. Be the first!</p>
               )}
             </div>
           </div>
         </div>
 
-        {/* Curated for You */}
+        {/* Browse Skills by Category */}
         <div>
           <div className="flex items-center justify-between mb-5">
-            <h2 className="text-lg font-bold text-white">Curated for You</h2>
+            <div className="flex items-center gap-2">
+              <Layers className="w-5 h-5 text-[#8955F3]" />
+              <h2 className="text-lg font-bold text-white">Browse Skills</h2>
+            </div>
             <Link to="/explore" className="text-sm text-[#8955F3] hover:text-[#a47cf5] flex items-center gap-1 transition-colors">
               View all <ChevronRight className="w-4 h-4" />
             </Link>
           </div>
-          {recsLoading ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-              {[...Array(6)].map((_, i) => <Skeleton key={i} className="h-56 rounded-2xl opacity-20" />)}
+          <CategoriesSection categories={categories} catsLoading={catsLoading} />
+        </div>
+
+        {/* Trending Roadmaps */}
+        <div>
+          <div className="flex items-center justify-between mb-5">
+            <div className="flex items-center gap-2">
+              <TrendingUp className="w-5 h-5 text-emerald-400" />
+              <h2 className="text-lg font-bold text-white">Trending Roadmaps</h2>
             </div>
-          ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-              {roadmaps.map(r => <RoadmapCard key={r._id} roadmap={r} />)}
-            </div>
-          )}
+            <Link to="/explore" className="text-sm text-[#8955F3] hover:text-[#a47cf5] flex items-center gap-1 transition-colors">
+              View all <ChevronRight className="w-4 h-4" />
+            </Link>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+            {(trendingLoading ? [...Array(6)] : trending.slice(0, 6)).map((r, i) =>
+              trendingLoading ? <Skeleton key={i} className="h-56 rounded-2xl opacity-20" /> : <RoadmapCard key={r._id} roadmap={r} />
+            )}
+          </div>
         </div>
 
       </div>
@@ -491,5 +570,5 @@ export default function DashboardPage() {
   if (showGuestDashboard) {
     return <GuestDashboard assessmentAnswers={assessmentAnswers} generatedRoadmap={generatedRoadmap} />;
   }
-  return <AuthDashboard user={user || { username: 'guest', full_name: 'Guest', avatar: '' }} assessmentAnswers={assessmentAnswers} />;
+  return <AuthDashboard user={user || { username: 'guest', full_name: 'Guest', avatar: '' }} />;
 }
