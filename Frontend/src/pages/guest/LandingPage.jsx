@@ -93,10 +93,10 @@ export default function LandingPage() {
               ဝါသနာကို ရှာဖွေပါ
               <svg className="arrow lime-arrow" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
             </Link>
-            <Link to="/assessment" className="btn btn-dark btn-explore-cta">
+            <a href="#courses" className="btn btn-dark btn-explore-cta">
               စိတ်ဝင်စားတာလေ့လာမယ်
               <svg className="arrow amber-arrow" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
-            </Link>
+            </a>
           </div>
         </div>
         <div className="divider"></div>
@@ -284,7 +284,7 @@ export default function LandingPage() {
           </div>
           <div className="course-grid">
             {courses.map((course) => (
-              <Link to="/assessment" key={course.title} className="course-card">
+              <Link to="/login" key={course.title} className="course-card">
                 <div className="course-card-image">
                   <img src={course.image} alt={course.title} />
                   <span className="course-lock"><LockKeyhole size={14} /> Locked</span>
