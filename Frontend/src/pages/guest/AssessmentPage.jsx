@@ -321,7 +321,7 @@ export default function AssessmentPage() {
 
       {/* Results Screen */}
       {step === 'results' && aiRoadmaps.length > 0 && (
-        <div className="flex-1 flex flex-col items-center justify-between py-8 md:py-12 px-4 w-full animate-in fade-in duration-700">
+        <div className="flex min-h-full flex-col items-center py-8 md:py-12 px-4 w-full animate-in fade-in duration-700">
           <div className="text-center w-full mt-2 md:mt-4">
             <h2 className="text-[#8a8d9b] uppercase tracking-widest text-xs mb-1">Your Top AI Recommendation</h2>
             <h1 className="text-4xl md:text-5xl font-bold m-0 text-transparent bg-clip-text bg-gradient-to-r from-[#00f0ff] to-[#b026ff] drop-shadow-[0_0_20px_rgba(0,240,255,0.3)]">
@@ -331,13 +331,13 @@ export default function AssessmentPage() {
           </div>
 
           {/* Top Roadmap Render */}
-          <div className="w-full max-w-7xl flex-1 flex flex-col justify-center my-8">
+          <div className="w-full max-w-7xl flex flex-col justify-center my-8 md:mb-12">
             <div className="text-center mb-8">
               <div className="text-[#00f0ff] uppercase tracking-widest text-xs mb-1">Primary Milestones</div>
               <h3 className="text-2xl md:text-3xl font-bold">Project <span className="text-[#b026ff]">Roadmap</span></h3>
             </div>
 
-            <div className="relative w-full py-8 md:py-20 flex flex-col md:flex-row md:justify-center md:items-center">
+            <div className="relative w-full min-h-[420px] py-8 md:min-h-[390px] md:py-0 flex flex-col md:flex-row md:justify-center md:items-center">
               {/* Desktop Horizontal Line */}
               <div className="hidden md:block absolute top-1/2 left-[3%] right-[3%] h-[3px] bg-gradient-to-r from-[#00f0ff] to-[#b026ff] -translate-y-1/2 shadow-[0_0_15px_rgba(0,240,255,0.4)] z-0"></div>
 
@@ -356,7 +356,7 @@ export default function AssessmentPage() {
                   const shadowClass = isBottom ? 'shadow-[0_0_10px_#b026ff]' : 'shadow-[0_0_10px_#00f0ff]';
 
                   return (
-                    <div key={idx} className="relative flex flex-row md:flex-col items-center md:justify-center w-full md:flex-1 md:max-w-[170px] md:h-0">
+                    <div key={idx} className="relative flex flex-row md:flex-col items-center md:justify-center w-full md:flex-1 md:max-w-[190px] md:h-[390px]">
                       {/* Mobile dot wrapper */}
                       <div className="md:hidden relative z-10 flex-shrink-0 w-[40px] flex justify-center mr-4">
                         <div className={`w-4 h-4 rounded-full bg-[#0b0c10] border-[3px] ${colorClass} ${shadowClass}`}></div>
@@ -373,7 +373,7 @@ export default function AssessmentPage() {
                       </div>
 
                       {/* Desktop Layout */}
-                      <div className={`hidden md:flex absolute flex-col items-center w-full`} style={{ [isBottom ? 'top' : 'bottom']: '0px' }}>
+                      <div className="hidden md:flex absolute flex-col items-center w-full" style={{ [isBottom ? 'top' : 'bottom']: '50%' }}>
                         {!isBottom ? (
                           <>
                             <div className={`w-full bg-[#15161c] rounded-xl p-3 shadow-xl border-t-2 border-l-[1px] border-r-[1px] border-b-[1px] border-b-white/5 border-l-white/10 border-r-white/5 ${colorClass} hover:shadow-[0_0_15px_rgba(0,240,255,0.2)] transition-shadow`}>
@@ -403,7 +403,7 @@ export default function AssessmentPage() {
 
           {/* Optional Alternative Roadmaps (4 items) */}
           {aiRoadmaps.length > 1 && (
-            <div className="w-full max-w-4xl mb-12">
+            <div className="w-full max-w-4xl mb-14">
               <h3 className="text-xl font-bold mb-6 text-center text-[#8a8d9b]">Optional Alternative Paths</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {aiRoadmaps.slice(1).map((roadmap, idx) => (
@@ -423,7 +423,7 @@ export default function AssessmentPage() {
             </div>
           )}
 
-          <div className="flex flex-wrap justify-center gap-4 mb-4">
+          <div className="flex flex-wrap justify-center gap-4 mb-8">
             <button
               onClick={handleSaveClick}
               className="flex items-center justify-center gap-2 bg-gradient-to-r from-[#00f0ff] to-[#b026ff] text-white font-bold py-3 px-8 rounded-full hover:-translate-y-1 transition-all shadow-[0_4px_15px_rgba(176,38,255,0.3)]"
@@ -459,4 +459,3 @@ export default function AssessmentPage() {
     </div>
   );
 }
-
