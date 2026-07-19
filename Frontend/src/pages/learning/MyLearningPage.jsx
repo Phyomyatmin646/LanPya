@@ -56,12 +56,12 @@ export default function MyLearningPage() {
                 <div className="mt-auto">
                   <div className="flex items-center justify-between text-xs text-[#57606A] mb-1">
                     <span>Progress</span>
-                    <span className="font-medium text-[#24292F]">{Math.round(prog.progress_percentage || 0)}%</span>
+                    <span className="font-medium text-[#24292F]">{Math.round(prog.progress || 0)}%</span>
                   </div>
                   <div className="h-2 w-full bg-[#E5E7EB] rounded-full overflow-hidden">
                     <div 
-                      className={`h-full ${prog.progress_percentage === 100 ? 'bg-[#2DA44E]' : 'bg-accent'}`}
-                      style={{ width: `${prog.progress_percentage || 0}%` }}
+                      className={`h-full ${prog.progress === 100 ? 'bg-[#2DA44E]' : 'bg-accent'}`}
+                      style={{ width: `${prog.progress || 0}%` }}
                     />
                   </div>
                 </div>

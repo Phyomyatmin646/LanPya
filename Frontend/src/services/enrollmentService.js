@@ -7,6 +7,6 @@ export const enrollmentService = {
 };
 
 export const progressService = {
-  markLesson:        (lessonId)  => api.post(`/progress/lesson/${lessonId}`),
+  markLesson:        (lessonId)  => api.post(`/progress/lesson/${lessonId}`, { completed: true }),
   getRoadmapProgress:(roadmapId) => api.get(`/progress/roadmap/${roadmapId}`),
 };

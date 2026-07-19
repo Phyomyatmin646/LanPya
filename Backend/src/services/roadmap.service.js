@@ -69,6 +69,22 @@ exports.recalculateProgress = async (userId, roadmapId) => {
       const user = await User.findById(userId);
       const roadmap = await Roadmap.findById(roadmapId);
       if (user && roadmap) {
+        
+        const longMessage = `Dear ${user.full_name},\n\nCongratulations on successfully completing the "${roadmap.title}" roadmap on LanPya! 🎉\n\nYour dedication, consistency, and passion for learning have truly paid off. We are thrilled to see you achieve this milestone. The skills you have gained will undoubtedly serve as a strong foundation for your future endeavors.\n\nKeep pushing boundaries and exploring new horizons. We can't wait to see what you achieve next!\n\nBest regards,\nThe LanPya Team`;
+        
+        const htmlMessage = `
+          <div style="font-family: Arial, sans-serif; color: #333; line-height: 1.6; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eaeaea; border-radius: 10px;">
+            <h2 style="color: #4F46E5;">Congratulations, ${user.full_name}! 🎉</h2>
+            <p>We are absolutely thrilled to inform you that you have successfully completed the <strong>"${roadmap.title}"</strong> roadmap on LanPya.</p>
+            <p>Your dedication, consistency, and passion for learning have truly paid off. We are incredibly proud to see you achieve this milestone. The skills you have gained throughout this journey will undoubtedly serve as a strong foundation for your future endeavors and career growth.</p>
+            <p>Remember, learning is a continuous journey. Keep pushing boundaries, exploring new horizons, and building amazing things!</p>
+            <br/>
+            <p>We can't wait to see what you achieve next.</p>
+            <hr style="border: none; border-top: 1px solid #eaeaea; margin: 20px 0;" />
+            <p style="font-size: 14px; color: #666;">Best regards,<br/><strong>The LanPya Team</strong></p>
+          </div>
+        `;
+
         fetch("http://n8n:5678/webhook/roadmap-completed", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -76,7 +92,9 @@ exports.recalculateProgress = async (userId, roadmapId) => {
             email: user.email,
             name: user.full_name,
             roadmap_title: roadmap.title,
-            completed_at: new Date().toISOString()
+            completed_at: new Date().toISOString(),
+            message: longMessage,
+            html_message: htmlMessage
           })
         }).catch(err => console.error("Webhook trigger failed:", err.message));
       }

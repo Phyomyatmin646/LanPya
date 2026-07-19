@@ -1,73 +1,37 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { roadmapService } from '../../services/roadmapService';
 import { SearchBar } from '../../components/ui/SearchBar';
 import { Pagination } from '../../components/ui/Pagination';
 import { Skeleton } from '../../components/ui/Skeleton';
 import { BookOpen, Star, Filter } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 
 export default function ExplorePage() {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [category, setCategory] = useState('');
+  const [searchParams] = useSearchParams();
+  const searchTerm = searchParams.get('q') || '';
   const [page, setPage] = useState(1);
   const limit = 10;
 
-  const { data: roadmapsResponse, isLoading } = useQuery({
-    queryKey: ['roadmaps', { page, limit, search: searchTerm, category }],
-    queryFn: () => roadmapService.getAll({ page, limit, search: searchTerm, category }),
-  });
+  // Reset page to 1 when search term changes
+  useEffect(() => {
+    setPage(1);
+  }, [searchTerm]);
 
-  const { data: categoriesResponse } = useQuery({
-    queryKey: ['categories'],
-    queryFn: () => roadmapService.getCategories(),
+  const { data: roadmapsResponse, isLoading } = useQuery({
+    queryKey: ['roadmaps', { page, limit, search: searchTerm }],
+    queryFn: () => roadmapService.getAll({ page, limit, search: searchTerm }),
   });
 
   const roadmaps = roadmapsResponse?.data?.data || [];
   const pagination = roadmapsResponse?.data?.pagination;
-  const categories = categoriesResponse?.data?.data || [];
 
   return (
     <div className="container-gh py-6">
       
       <div className="flex flex-col md:flex-row gap-6">
         
-        {/* Left Sidebar - Filters */}
-        <div className="w-full md:w-1/4 shrink-0">
-          <div className="mb-4">
-            <h3 className="text-sm font-semibold text-[#24292F] mb-2 pb-1 border-b border-[#D0D7DE]">Filters</h3>
-            <SearchBar 
-              value={searchTerm} 
-              onChange={(val) => { setSearchTerm(val); setPage(1); }} 
-              placeholder="Find a roadmap..." 
-              className="mb-4"
-            />
-          </div>
-          
-          <div className="mb-4">
-            <h3 className="text-sm font-semibold text-[#24292F] mb-2 pb-1 border-b border-[#D0D7DE]">Categories</h3>
-            <ul className="space-y-1">
-              <li>
-                <button
-                  onClick={() => { setCategory(''); setPage(1); }}
-                  className={`w-full text-left px-2 py-1.5 text-sm rounded-md transition-colors ${!category ? 'bg-[#F3F4F6] font-medium text-[#24292F]' : 'text-[#57606A] hover:bg-[#F3F4F6] hover:text-[#24292F]'}`}
-                >
-                  All Categories
-                </button>
-              </li>
-              {categories.map(cat => (
-                <li key={cat._id}>
-                  <button
-                    onClick={() => { setCategory(cat._id); setPage(1); }}
-                    className={`w-full text-left px-2 py-1.5 text-sm rounded-md transition-colors ${category === cat._id ? 'bg-[#F3F4F6] font-medium text-[#24292F]' : 'text-[#57606A] hover:bg-[#F3F4F6] hover:text-[#24292F]'}`}
-                  >
-                    {cat.name}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
+
 
         {/* Main Content - Repository List */}
         <div className="flex-1">

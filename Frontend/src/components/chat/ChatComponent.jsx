@@ -151,7 +151,7 @@ export default function ChatComponent() {
             throw new Error(data.error);
           }
           if (data.done && data.chat) {
-            setMessages(prev => prev.map(m => m.id === aiMessageId ? { ...m, id: data.chat._id } : m));
+            setMessages(prev => prev.map(m => m.id === aiMessageId ? { ...m, id: data.chat._id, content: data.chat.ai_response || aiFullResponse } : m));
             if (data.title) {
               setSessions(prev => prev.map(s => s._id === activeSessionId ? { ...s, title: data.title } : s));
             }
@@ -172,28 +172,6 @@ export default function ChatComponent() {
         const events = eventBuffer.split('\n\n');
         eventBuffer = events.pop() || '';
 
-        for (const line of lines) {
-          if (line.startsWith('data: ')) {
-            const dataStr = line.replace('data: ', '').trim();
-            if (!dataStr) continue;
-            
-            try {
-              const data = JSON.parse(dataStr);
-              if (data.error) {
-                toast.error(data.error);
-              } else if (data.done && data.chat) {
-                setMessages(prev => prev.map(m => m.id === aiMessageId ? { ...m, id: data.chat._id, content: data.chat.ai_response || aiFullResponse } : m));
-                if (data.title) {
-                  setSessions(prev => prev.map(s => s._id === activeSessionId ? { ...s, title: data.title } : s));
-                }
-              } else if (data.content) {
-                aiFullResponse += data.content;
-                setMessages(prev => prev.map(m => m.id === aiMessageId ? { ...m, content: aiFullResponse } : m));
-              }
-            } catch (err) {
-              // ignore partial parse errors
-            }
-          }
         for (const event of events) {
           consumeEvent(event);
         }

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { miscService } from '../../services/miscService';
 import { roadmapService } from '../../services/roadmapService';
@@ -13,6 +13,7 @@ import {
 import { Link, useNavigate } from 'react-router-dom';
 import { Skeleton } from '../../components/ui/Skeleton';
 import { Avatar } from '../../components/ui/Avatar';
+import { toast } from 'react-hot-toast';
 
 // ── Color theme ───────────────────────────────────────────────
 // Primary dark  : #3E276D
@@ -629,13 +630,32 @@ function AuthDashboard({ user }) {
 // ── Main Page ─────────────────────────────────────────────────
 export default function DashboardPage() {
   const { user } = useAuth();
-  const { savedAiRoadmaps, generatedRoadmap, assessmentAnswers, isGuest } = useGuestStore();
+  const { savedAiRoadmaps, generatedRoadmap, assessmentAnswers, isGuest, clearGuestData } = useGuestStore();
 
   const activeRoadmap = (savedAiRoadmaps && savedAiRoadmaps.length > 0) 
     ? savedAiRoadmaps[savedAiRoadmaps.length - 1] 
     : generatedRoadmap;
 
   const showGuestDashboard = !user && isGuest && activeRoadmap;
+
+  useEffect(() => {
+    if (user && isGuest) {
+      const roadmapsToSave = savedAiRoadmaps?.length > 0 ? savedAiRoadmaps : (generatedRoadmap ? [generatedRoadmap] : []);
+      if (roadmapsToSave.length > 0) {
+        Promise.all(roadmapsToSave.map(rm => roadmapService.saveCustom(rm)))
+          .then(() => {
+            toast.success("We've saved your custom AI roadmap to your account!");
+            clearGuestData();
+          })
+          .catch(err => {
+            console.error(err);
+            toast.error("Failed to sync your custom roadmap");
+          });
+      } else {
+        clearGuestData();
+      }
+    }
+  }, [user, isGuest, savedAiRoadmaps, generatedRoadmap, clearGuestData]);
 
   if (showGuestDashboard) {
     return <GuestDashboard assessmentAnswers={assessmentAnswers} generatedRoadmap={activeRoadmap} />;

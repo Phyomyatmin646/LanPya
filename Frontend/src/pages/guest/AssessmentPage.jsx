@@ -197,7 +197,7 @@ export default function AssessmentPage() {
       const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001/api/v1';
       
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 12000); // 12 second timeout
+      const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 second timeout
       
       const response = await fetch(`${apiUrl}/guest-assessment`, {
         method: 'POST',

@@ -1,16 +1,37 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, CheckCircle, XCircle } from 'lucide-react';
 import { quizService } from '../../services/quizService';
+
+// Fisher-Yates Shuffle
+const shuffleArray = (array) => {
+  const arr = [...array];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+};
 
 export const QuizModal = ({ quizData, isOpen, onClose, onSuccess }) => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [result, setResult] = useState(null);
+  const [shuffledQuestions, setShuffledQuestions] = useState([]);
 
-  if (!isOpen || !quizData) return null;
+  useEffect(() => {
+    if (quizData?.questions) {
+      const shuffled = shuffleArray(quizData.questions).map(q => ({
+        ...q,
+        shuffledOptions: shuffleArray(['a', 'b', 'c', 'd'])
+      }));
+      setShuffledQuestions(shuffled);
+    }
+  }, [quizData]);
 
-  const { quiz, questions } = quizData;
+  if (!isOpen || !quizData || shuffledQuestions.length === 0) return null;
+
+  const { quiz } = quizData;
 
   const handleSelectOption = (questionId, optionKey) => {
     setAnswers({ ...answers, [questionId]: optionKey });
@@ -39,8 +60,8 @@ export const QuizModal = ({ quizData, isOpen, onClose, onSuccess }) => {
     }
   };
 
-  const currentQuestion = questions[currentQuestionIndex];
-  const isLastQuestion = currentQuestionIndex === questions.length - 1;
+  const currentQuestion = shuffledQuestions[currentQuestionIndex];
+  const isLastQuestion = currentQuestionIndex === shuffledQuestions.length - 1;
   const isPassed = result?.score >= quiz.passing_score;
 
   return (
@@ -94,11 +115,11 @@ export const QuizModal = ({ quizData, isOpen, onClose, onSuccess }) => {
           ) : (
             <div>
               <div className="flex justify-between items-center mb-6 text-sm text-gray-500 font-medium">
-                <span>Question {currentQuestionIndex + 1} of {questions.length}</span>
+                <span>Question {currentQuestionIndex + 1} of {shuffledQuestions.length}</span>
                 <div className="w-32 bg-gray-200 rounded-full h-2 overflow-hidden">
                   <div 
                     className="bg-blue-600 h-full transition-all duration-300"
-                    style={{ width: `${((currentQuestionIndex + 1) / questions.length) * 100}%` }}
+                    style={{ width: `${((currentQuestionIndex + 1) / shuffledQuestions.length) * 100}%` }}
                   />
                 </div>
               </div>
@@ -106,7 +127,7 @@ export const QuizModal = ({ quizData, isOpen, onClose, onSuccess }) => {
               <h3 className="text-lg font-semibold text-gray-800 mb-4">{currentQuestion.question}</h3>
               
               <div className="space-y-3">
-                {['a', 'b', 'c', 'd'].map(key => {
+                {currentQuestion.shuffledOptions.map((key, index) => {
                   const optionText = currentQuestion[`option_${key}`];
                   if (!optionText) return null;
                   
@@ -122,7 +143,7 @@ export const QuizModal = ({ quizData, isOpen, onClose, onSuccess }) => {
                           : 'border-gray-200 hover:border-gray-300 bg-white text-gray-700'
                       }`}
                     >
-                      <span className="inline-block w-6 font-bold uppercase mr-2">{key}.</span>
+                      <span className="inline-block w-6 font-bold uppercase mr-2">{String.fromCharCode(65 + index)}.</span>
                       {optionText}
                     </button>
                   );
@@ -146,14 +167,14 @@ export const QuizModal = ({ quizData, isOpen, onClose, onSuccess }) => {
             {isLastQuestion ? (
               <button
                 onClick={handleSubmit}
-                disabled={Object.keys(answers).length < questions.length || isSubmitting}
+                disabled={Object.keys(answers).length < shuffledQuestions.length || isSubmitting}
                 className="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center"
               >
                 {isSubmitting ? 'Submitting...' : 'Submit Quiz'}
               </button>
             ) : (
               <button
-                onClick={() => setCurrentQuestionIndex(prev => Math.min(questions.length - 1, prev + 1))}
+                onClick={() => setCurrentQuestionIndex(prev => Math.min(shuffledQuestions.length - 1, prev + 1))}
                 className="bg-gray-800 text-white px-6 py-2 rounded-lg font-medium hover:bg-gray-900 transition-colors"
               >
                 Next

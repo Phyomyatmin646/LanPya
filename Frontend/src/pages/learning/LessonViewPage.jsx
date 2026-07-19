@@ -6,7 +6,7 @@ import { progressService } from '../../services/enrollmentService';
 import { FileText, CheckCircle, Circle, ChevronLeft, MessageSquare, PlayCircle, FileDown, Lock, GraduationCap } from 'lucide-react';
 import { Skeleton } from '../../components/ui/Skeleton';
 import { toast } from 'react-hot-toast';
-import ChatComponent from '../chat/ChatComponent';
+import ChatComponent from '../../components/chat/ChatComponent';
 import { useAuth } from '../../hooks/useAuth';
 import { quizService } from '../../services/quizService';
 import { QuizModal } from '../../components/quiz/QuizModal';

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { roadmapService } from '../../services/roadmapService';
+import { quizService } from '../../services/quizService';
 import {
   PlayCircle, CheckCircle2, ChevronLeft, ChevronRight,
   List, Share2, ThumbsUp, Clock, BookOpen, Users,
@@ -106,12 +107,10 @@ export default function RoadmapDetailPage() {
     mutationFn: (lessonId) => import('../../services/enrollmentService').then(m => m.progressService.markLesson(lessonId)),
     onSuccess: (data, variables) => {
       queryClient.invalidateQueries(['progress', id]);
+      queryClient.invalidateQueries(['my-enrollments']);
       
       const currentModule = activeLesson.module;
       const moduleLessonIds = currentModule.lessons.map(l => l._id);
-      
-      // Popup lesson quiz
-      setTimeout(() => setActiveLessonQuiz(activeLesson.lesson), 300);
 
       // We manually add it here to check completion without waiting for refetch
       const tempCompleted = new Set(completedSet);
@@ -124,8 +123,89 @@ export default function RoadmapDetailPage() {
     }
   });
 
-  const handleMarkAsComplete = (lessonId) => {
-    markCompleteMutation.mutate(lessonId);
+  const triggerMockQuiz = (lessonId) => {
+    const genericQuestions = [
+      {
+        _id: 'q1',
+        question: `What was the primary focus of the lesson: "${activeLesson.lesson.title}"?`,
+        option_a: 'Understanding the core concepts',
+        option_b: 'Learning about unrelated topics',
+        option_c: 'Reviewing past modules',
+        option_d: 'Skipping the material'
+      },
+      {
+        _id: 'q2',
+        question: `How would you apply what you learned in "${activeLesson.lesson.title}"?`,
+        option_a: 'By practicing the concepts in real projects',
+        option_b: 'By doing nothing',
+        option_c: 'By forgetting it immediately',
+        option_d: 'By avoiding it completely'
+      },
+      {
+        _id: 'q3',
+        question: `Which of the following best describes your understanding of "${activeLesson.lesson.title}"?`,
+        option_a: 'I grasped the main concepts and tools',
+        option_b: 'It was somewhat confusing',
+        option_c: 'I need to watch it again',
+        option_d: 'None of the above'
+      },
+      {
+        _id: 'q4',
+        question: `What is the most important takeaway from "${activeLesson.lesson.title}"?`,
+        option_a: 'The key principles discussed in the video',
+        option_b: 'The background music',
+        option_c: 'The length of the video',
+        option_d: 'Nothing at all'
+      },
+      {
+        _id: 'q5',
+        question: `After watching "${activeLesson.lesson.title}", what is your next step?`,
+        option_a: 'Proceed to the next lesson to build on this knowledge',
+        option_b: 'Stop learning completely',
+        option_c: 'Skip the rest of the module',
+        option_d: 'Give up on the roadmap'
+      }
+    ];
+
+    // Shuffle the pool and pick a random question
+    const shuffledPool = genericQuestions.sort(() => 0.5 - Math.random());
+    const selectedQuestions = shuffledPool.slice(0, 1);
+
+    setActiveLessonQuiz({
+      lesson: activeLesson.lesson,
+      quizData: {
+        quiz: {
+          _id: `mock-lesson-quiz-${lessonId}`,
+          title: `Quiz: ${activeLesson.lesson.title}`,
+          passing_score: 50,
+          isMock: true
+        },
+        questions: selectedQuestions
+      }
+    });
+  };
+
+  const handleMarkAsComplete = async (lessonId) => {
+    try {
+      const response = await quizService.getQuizByLesson(lessonId);
+      if (response?.data?.data?.quiz) {
+        setActiveLessonQuiz({
+          lesson: activeLesson.lesson,
+          quizData: response.data.data
+        });
+      } else {
+        triggerMockQuiz(lessonId);
+      }
+    } catch (error) {
+      if (error.response?.status === 404) {
+        // No quiz found in DB, use fallback mock quiz so user can still take one
+        triggerMockQuiz(lessonId);
+      } else {
+        toast.error("Failed to fetch quiz");
+        // Fallback on error to unblock user
+        triggerMockQuiz(lessonId);
+      }
+    }
   };
 
   const goTo = (idx) => {
@@ -169,7 +249,14 @@ export default function RoadmapDetailPage() {
     );
   }
 
-  const embedUrl = activeLesson?.resource ? getEmbedUrl(activeLesson.resource.url) : null;
+  let rawIframeHtml = null;
+  if (activeLesson?.resource?.url?.includes('<iframe')) {
+    rawIframeHtml = activeLesson.resource.url;
+  } else if (activeLesson?.lesson?.title?.includes('<iframe')) {
+    rawIframeHtml = activeLesson.lesson.title.substring(activeLesson.lesson.title.indexOf('<iframe'));
+  }
+
+  const embedUrl = !rawIframeHtml && activeLesson?.resource?.url ? getEmbedUrl(activeLesson.resource.url) : null;
 
   return (
     <div className="min-h-screen bg-[#0f0f0f] text-white">
@@ -190,11 +277,17 @@ export default function RoadmapDetailPage() {
 
             {/* Video Player */}
             <div className="relative bg-black rounded-xl overflow-hidden aspect-video w-full shadow-2xl">
-              {embedUrl ? (
+              {rawIframeHtml ? (
+                <div 
+                  key={activeLesson?.lesson._id}
+                  className="w-full h-full [&>iframe]:w-full [&>iframe]:h-full"
+                  dangerouslySetInnerHTML={{ __html: rawIframeHtml }}
+                />
+              ) : embedUrl ? (
                 <iframe
                   key={activeLesson?.lesson._id}
                   src={embedUrl}
-                  title={activeLesson?.lesson?.title || 'Lesson Video'}
+                  title={activeLesson?.lesson?.title?.split('<iframe')[0] || 'Lesson Video'}
                   className="w-full h-full"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                   allowFullScreen
@@ -236,7 +329,7 @@ export default function RoadmapDetailPage() {
             <div className="mt-4 flex items-start justify-between gap-4">
               <div>
                 <h1 className="text-xl font-semibold text-white leading-snug">
-                  {activeLesson?.lesson?.title || roadmap.title}
+                  {activeLesson?.lesson?.title?.split('<iframe')[0] || roadmap.title}
                 </h1>
                 {activeLesson?.lesson?.description && (
                   <p className="text-sm text-white/50 mt-1">{activeLesson.lesson.description}</p>
@@ -477,29 +570,12 @@ export default function RoadmapDetailPage() {
         onClose={() => setActiveLessonQuiz(null)}
         onSuccess={() => {
           setActiveLessonQuiz(null);
-          // Optionally go to next lesson automatically when quiz passed
-          if (activeIndex >= 0 && activeIndex < totalLessons - 1) {
-            goTo(activeIndex + 1);
+          if (activeLessonQuiz) {
+            markCompleteMutation.mutate(activeLessonQuiz.lesson._id);
           }
+          toast.success("Lesson completed!");
         }}
-        quizData={activeLessonQuiz ? {
-          quiz: {
-            _id: `mock-lesson-quiz-${activeLessonQuiz._id}`,
-            title: `Quiz: ${activeLessonQuiz.title}`,
-            passing_score: 50,
-            isMock: true
-          },
-          questions: [
-            {
-              _id: 'q1',
-              question: `What did you learn from the lesson: "${activeLessonQuiz.title}"?`,
-              option_a: 'I grasped the main concepts and tools.',
-              option_b: 'It was somewhat confusing.',
-              option_c: 'I need to watch it again.',
-              option_d: 'None of the above.',
-            }
-          ]
-        } : null}
+        quizData={activeLessonQuiz?.quizData || null}
       />
     </div>
   );

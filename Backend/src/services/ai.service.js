@@ -17,17 +17,17 @@ exports.chatWithAI = async (userMessage, history = [], context = {}, res = null)
     if (!systemPrompt.includes('YouTube search links')) {
       systemPrompt += " - If the user asks about courses or lessons related to their roadmap or learning steps, recommend relevant courses by providing YouTube search links in this format: [Watch Course on YouTube](https://www.youtube.com/results?search_query=Learn+[Topic]+full+course).";
     }
-    
+
     // Fetch recent negative feedbacks for this user to inject as "mistakes to avoid"
     const ChatHistory = require("../models/chatHistory.model");
-    const badFeedbacks = await ChatHistory.find({ 
+    const badFeedbacks = await ChatHistory.find({
       session_id: { $in: await require("../models/chatSession.model").find({ user_id: context.userId }).distinct("_id") },
-      feedback_rating: -1 
+      feedback_rating: -1
     }).sort({ created_at: -1 }).limit(3).lean();
-    
+
     let learningContext = "";
     if (badFeedbacks.length > 0) {
-      learningContext = "\n\nPAST MISTAKES TO AVOID based on user feedback:\n" + 
+      learningContext = "\n\nPAST MISTAKES TO AVOID based on user feedback:\n" +
         badFeedbacks.map(f => `- You said: "${f.ai_response.substring(0, 50)}..." which the user disliked.`).join("\n");
     }
 
@@ -46,21 +46,21 @@ exports.chatWithAI = async (userMessage, history = [], context = {}, res = null)
       const toolRes = await executeTool("get_detailed_learning_review", {}, context);
       preExecutedToolContext = `\nSystem context from 'get_detailed_learning_review' tool: ${toolRes}\nUse this data to suggest next lessons.`;
     } else if (userMessage === "ဒီ Website ကို ဘယ်လိုအသုံးပြုရမလဲ?") {
-      const toolRes = await executeTool("search_knowledge_base", { query: "How to use LanPya website" }, context);
-      preExecutedToolContext = `\nSystem context from 'search_knowledge_base' tool: ${toolRes}\nUse this data to answer the user.`;
+      const fallbackFAQ = "LanPya is an AI-powered learning platform. You can: 1. Take assessments to get custom roadmaps. 2. Learn step-by-step with videos. 3. Take quizzes to track progress. 4. Earn certificates automatically via n8n integration upon 100% completion. 5. Chat with LanPya AI for help.";
+      preExecutedToolContext = `\nSystem context for website usage: ${fallbackFAQ}\nPlease explain this clearly in Burmese to the user.`;
     }
 
     const messages = [
       { role: "system", content: systemPrompt + learningContext + preExecutedToolContext }
     ];
-    
+
     history.forEach(h => {
       messages.push({
         role: h.role === 'model' ? 'assistant' : 'user',
         content: h.parts[0].text
       });
     });
-    
+
     messages.push({ role: "user", content: userMessage });
 
     // Only enable tools if we didn't pre-execute an FAQ tool
@@ -74,13 +74,13 @@ exports.chatWithAI = async (userMessage, history = [], context = {}, res = null)
         messages: messages,
         stream: true,
         options: {
-          num_ctx: 1024, // Greatly reduced context for speed
-          num_predict: 256, // Limit output length
+          num_ctx: 8192, // Increased context
+          num_predict: 4096, // Allow longer output
           num_thread: 8, // Maximize CPU threads
           temperature: 0.6 // Slightly lower temperature for faster, more deterministic generation
         }
       };
-      
+
       if (enableTools) {
         payload.tools = toolDefinitions;
       }
@@ -101,7 +101,7 @@ exports.chatWithAI = async (userMessage, history = [], context = {}, res = null)
       // Node.js native fetch streaming
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
-      
+
       let buffer = "";
 
       while (true) {
@@ -116,15 +116,15 @@ exports.chatWithAI = async (userMessage, history = [], context = {}, res = null)
                   res.write(`data: ${JSON.stringify({ content: data.message.content })}\n\n`);
                 }
               }
-            } catch(e) {}
+            } catch (e) { }
           }
           break;
         }
-        
+
         buffer += decoder.decode(value, { stream: true });
         const lines = buffer.split('\n');
         buffer = lines.pop(); // keep incomplete line in buffer
-        
+
         for (const line of lines) {
           if (!line.trim()) continue;
           try {
@@ -161,13 +161,13 @@ exports.chatWithAI = async (userMessage, history = [], context = {}, res = null)
         for (const toolCall of toolCalls) {
           const toolName = toolCall.function.name;
           const toolArgs = toolCall.function.arguments;
-          
+
           const toolResult = await executeTool(toolName, toolArgs, context);
-          
+
           messages.push({
             role: "tool",
             content: toolResult,
-            name: toolName 
+            name: toolName
           });
         }
         iteration++;
@@ -178,7 +178,7 @@ exports.chatWithAI = async (userMessage, history = [], context = {}, res = null)
         return fullContent;
       }
     }
-    
+
     return messages[messages.length - 1].content || "I needed to think too long. Please try again.";
   } catch (error) {
     logger.error(`[AI Service] Chat Error: ${error.message}`);

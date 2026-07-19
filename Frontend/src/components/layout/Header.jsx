@@ -1,13 +1,41 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { Search, Bell, Menu, User as UserIcon, LogOut, Settings } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Avatar } from '../ui/Avatar';
 
 export function Header({ toggleSidebar }) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [showDropdown, setShowDropdown] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
+
+  useEffect(() => {
+    if (location.pathname === '/explore') {
+      setSearchQuery(searchParams.get('q') || '');
+    } else {
+      setSearchQuery('');
+    }
+  }, [location.pathname, searchParams]);
+
+  const handleSearchChange = (e) => {
+    const val = e.target.value;
+    setSearchQuery(val);
+    if (location.pathname === '/explore') {
+      navigate(`/explore?q=${encodeURIComponent(val)}`, { replace: true });
+    }
+  };
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/explore?q=${encodeURIComponent(searchQuery.trim())}`);
+    } else {
+      navigate('/explore');
+    }
+  };
 
   const handleLogout = () => {
     logout();
@@ -45,14 +73,16 @@ export function Header({ toggleSidebar }) {
 
         {/* Global Search Bar */}
         <div className="hidden md:flex max-w-md w-full ml-4">
-          <div className="relative w-full">
+          <form onSubmit={handleSearch} className="relative w-full">
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#8C959F]" />
             <input 
               type="text"
+              value={searchQuery}
+              onChange={handleSearchChange}
               placeholder="Search or jump to..."
               className="w-full bg-[#24292F] border border-[#57606A] text-white text-sm rounded-md pl-9 pr-3 py-1.5 focus:bg-white focus:text-[#24292F] focus:border-accent focus:ring-2 focus:ring-accent/40 transition-colors"
             />
-          </div>
+          </form>
         </div>
       </div>
 
