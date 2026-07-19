@@ -4,6 +4,7 @@ import { useGuestStore } from '../../store/guestStore';
 import { Share2, RefreshCw } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { useAuth } from '../../hooks/useAuth';
+import { roadmapService } from '../../services/roadmapService';
 
 const questions = [
   {
@@ -183,35 +184,59 @@ export default function AssessmentPage() {
     setAiRoadmaps([]);
   };
 
-  const fetchAiRoadmaps = async (topTracks) => {
+  const fetchAiRoadmaps = async (topTracks, currentScores) => {
     setStep('loading');
+    
+    // Calculate percentages for the UI
+    const totalQuestions = questions.length;
+    const scorePercentages = Object.entries(currentScores)
+      .map(([track, score]) => ({ track, percentage: Math.round((score / totalQuestions) * 100) }))
+      .sort((a, b) => b.percentage - a.percentage);
+      
     try {
-      // In a real app, you'd use your configured axios instance
       const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001/api/v1';
+      
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 12000); // 12 second timeout
+      
       const response = await fetch(`${apiUrl}/guest-assessment`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ topTracks })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ topTracks }),
+        signal: controller.signal
       });
+      clearTimeout(timeoutId);
       
       const data = await response.json();
       if (data.success && data.data && data.data.roadmaps) {
+        // Inject percentages into the first roadmap description for display
+        data.data.roadmaps[0].scorePercentages = scorePercentages;
         setAiRoadmaps(data.data.roadmaps);
       } else {
         throw new Error("Invalid response format");
       }
     } catch (error) {
-      console.error("Failed to fetch AI roadmaps:", error);
-      toast.error("Failed to generate AI roadmaps. Using fallback.");
-      // Fallback
-      setAiRoadmaps([{
-        title: `${topTracks[0]} Master Path`,
-        description: "Your personalized top recommendation.",
-        modules: ["Basics", "Intermediate", "Advanced"],
-        isTopMatch: true
-      }]);
+      console.warn("AI generation failed or timed out. Using robust fallback.", error);
+      toast.error("AI is busy. Using instant personalized path.");
+      
+      // Robust Fallback using predefined roadmaps
+      const fallbackRoadmaps = topTracks.map((track, idx) => {
+        const predefined = roadmaps[track] || ["Fundamentals", "Intermediate Skills", "Advanced Projects", "Portfolio"];
+        return {
+          title: `${track} Master Path`,
+          description: idx === 0 
+            ? `Your personalized top recommendation based on your answers.` 
+            : `An excellent alternative path for you.`,
+          modules: predefined.map((stepName, stepIdx) => ({
+            name: `Step ${stepIdx + 1}: ${stepName}`,
+            tech: stepName
+          })),
+          isTopMatch: idx === 0,
+          scorePercentages: idx === 0 ? scorePercentages : null
+        };
+      });
+      
+      setAiRoadmaps(fallbackRoadmaps);
     }
     setStep('results');
   };
@@ -226,7 +251,7 @@ export default function AssessmentPage() {
       } else {
         const sortedTracks = Object.keys(newScores).sort((a, b) => newScores[b] - newScores[a]);
         const topTracks = sortedTracks.slice(0, 3); // Send top 3 tracks to AI
-        fetchAiRoadmaps(topTracks);
+        fetchAiRoadmaps(topTracks, newScores);
       }
     }, 300);
   };
@@ -242,13 +267,21 @@ export default function AssessmentPage() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleSaveClick = () => {
+  const handleSaveClick = async () => {
     // Save current top roadmap before redirecting
     const topTracks = Object.keys(scores).sort((a, b) => scores[b] - scores[a]).slice(0, 3);
     setGuestData({ interests: topTracks }, aiRoadmaps[0]);
+    
     if (user) {
-      toast.success('Roadmap saved to My Learning!');
-      navigate('/mylearning');
+      const toastId = toast.loading('Saving to your account...');
+      try {
+        await roadmapService.saveCustom(aiRoadmaps[0]);
+        toast.success('Roadmap saved to My Learning!', { id: toastId });
+        navigate('/mylearning');
+      } catch (error) {
+        toast.error('Failed to save roadmap', { id: toastId });
+        console.error(error);
+      }
     } else {
       navigate('/register');
     }
@@ -328,6 +361,18 @@ export default function AssessmentPage() {
               {aiRoadmaps[0].title}
             </h1>
             <p className="mt-4 text-[#8a8d9b] max-w-2xl mx-auto">{aiRoadmaps[0].description}</p>
+            
+            {/* Show Percentages */}
+            {aiRoadmaps[0].scorePercentages && (
+              <div className="mt-6 flex flex-wrap justify-center gap-3 max-w-3xl mx-auto">
+                {aiRoadmaps[0].scorePercentages.slice(0, 4).map((score, idx) => (
+                  <div key={idx} className="bg-[#15161c] border border-white/10 px-4 py-2 rounded-full flex items-center gap-2">
+                    <span className="text-xs text-[#8a8d9b] font-medium">{score.track}</span>
+                    <span className="text-sm font-bold text-[#00f0ff]">{score.percentage}%</span>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Top Roadmap Render */}

@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { progressService } from '../../services/enrollmentService';
+import { enrollmentService } from '../../services/enrollmentService';
 import { Link } from 'react-router-dom';
 import { BookOpen, CheckCircle2, ChevronRight, Activity } from 'lucide-react';
 import { Skeleton } from '../../components/ui/Skeleton';
@@ -8,35 +8,11 @@ import { useGuestStore } from '../../store/guestStore';
 
 export default function MyLearningPage() {
   const { data: progressResponse, isLoading } = useQuery({
-    queryKey: ['progress'],
-    queryFn: () => progressService.getMyProgress(),
+    queryKey: ['my-enrollments'],
+    queryFn: () => enrollmentService.getMyEnrollments(),
   });
 
-  const { savedAiRoadmaps, generatedRoadmap } = useGuestStore();
-
-  const apiRoadmaps = progressResponse?.data?.data || [];
-  
-  // Inject the custom AI roadmaps if they exist
-  const enrolledRoadmaps = [...apiRoadmaps];
-  
-  // Backwards compatibility with the old single object
-  const aiRoadmaps = Array.isArray(savedAiRoadmaps) && savedAiRoadmaps.length > 0 
-    ? savedAiRoadmaps 
-    : (generatedRoadmap ? [{...generatedRoadmap, _id: 'custom-ai-roadmap'}] : []);
-
-  // Reverse so newest is first
-  [...aiRoadmaps].reverse().forEach((aiRm) => {
-    enrolledRoadmaps.unshift({
-      _id: aiRm._id || `custom-ai-${Date.now()}`,
-      isCustom: true,
-      roadmap: {
-        _id: aiRm._id || 'custom-ai-roadmap', // We use this in the link
-        title: aiRm.title,
-        description: aiRm.description || 'Your custom AI generated roadmap path.'
-      },
-      progress_percentage: 0
-    });
-  });
+  const enrolledRoadmaps = progressResponse?.data?.data || [];
 
   return (
     <div className="container-gh py-8">
@@ -69,11 +45,11 @@ export default function MyLearningPage() {
                 <div className="flex items-center gap-2 mb-2">
                   <BookOpen className="w-5 h-5 text-[#57606A]" />
                   <h3 className="font-semibold text-lg text-[#0969DA] group-hover:underline line-clamp-1">
-                    {prog.roadmap.title}
+                    {prog.roadmap_id?.title}
                   </h3>
                 </div>
                 <p className="text-sm text-[#57606A] mb-4 line-clamp-2">
-                  {prog.roadmap.description}
+                  {prog.roadmap_id?.description}
                 </p>
                 
                 {/* Progress Bar */}
@@ -91,7 +67,7 @@ export default function MyLearningPage() {
                 </div>
               </div>
               <div className="bg-[#F6F8FA] px-4 py-3 border-t border-[#D0D7DE] flex items-center justify-between">
-                {prog.isCustom ? (
+                {prog.roadmap_id?.is_public === false ? (
                   <span className="text-xs text-[#8955F3] font-semibold">Custom AI Path</span>
                 ) : prog.progress_percentage === 100 ? (
                   <span className="flex items-center gap-1 text-sm font-medium text-[#1A7F37]">
@@ -100,8 +76,8 @@ export default function MyLearningPage() {
                 ) : (
                   <span className="text-xs text-[#57606A]">Keep going!</span>
                 )}
-                <Link to={`/roadmaps/${prog.roadmap._id}`} className="btn btn-default text-xs py-1 h-7">
-                  {prog.isCustom ? 'View' : 'Continue'} <ChevronRight className="w-3 h-3 ml-1" />
+                <Link to={`/roadmaps/${prog.roadmap_id?._id}`} className="btn btn-default text-xs py-1 h-7">
+                  {prog.roadmap_id?.is_public === false ? 'View' : 'Continue'} <ChevronRight className="w-3 h-3 ml-1" />
                 </Link>
               </div>
             </div>

@@ -6,6 +6,7 @@ export const roadmapService = {
   getFullRoadmap: (id)     => api.get(`/roadmaps/${id}/full`),
   getCategoriesWithRoadmaps: () => api.get('/roadmaps/categories-with-roadmaps'),
   create:   (data)         => api.post('/roadmaps', data),
+  saveCustom:(data)        => api.post('/roadmaps/save-custom', data),
   update:   (id, data)     => api.put(`/roadmaps/${id}`, data),
   remove:   (id)           => api.delete(`/roadmaps/${id}`),
 

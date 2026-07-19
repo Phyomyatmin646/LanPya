@@ -24,7 +24,7 @@ export default function SettingsPage() {
     onError: (err) => toast.error(getErrorMessage(err)),
   });
 
-  const handleLogout = () => { logout(); navigate('/login'); };
+  const handleLogout = () => { logout(); navigate('/'); };
 
   return (
     <div className="max-w-xl mx-auto space-y-6 animate-fade-in">

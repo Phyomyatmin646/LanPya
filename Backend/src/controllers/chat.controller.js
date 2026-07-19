@@ -72,7 +72,7 @@ exports.sendMessage = asyncHandler(async (req, res) => {
     const chat = await ChatHistory.create({
       session_id: session._id,
       user_message: message,
-      ai_response: aiResponse,
+      ai_response: aiResponse || "Sorry, I encountered an error and couldn't generate a response.",
       model_name: process.env.OLLAMA_MODEL || "gemma4:12b",
     });
 

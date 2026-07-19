@@ -20,6 +20,19 @@ export const useGuestStore = create(
             savedAiRoadmaps: [...existing, newRoadmap]
           };
         }),
+      markLessonCompleted: (roadmapId, lessonId) =>
+        set((state) => {
+          const updatedRoadmaps = state.savedAiRoadmaps.map((rm) => {
+            if (rm._id === roadmapId) {
+              const completed = rm.completedLessons || [];
+              if (!completed.includes(lessonId)) {
+                return { ...rm, completedLessons: [...completed, lessonId] };
+              }
+            }
+            return rm;
+          });
+          return { savedAiRoadmaps: updatedRoadmaps };
+        }),
       clearGuestData: () => 
         set({ isGuest: false, assessmentAnswers: null, savedAiRoadmaps: [] }),
     }),

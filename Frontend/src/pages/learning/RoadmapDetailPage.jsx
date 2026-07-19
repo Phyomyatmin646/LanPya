@@ -11,10 +11,13 @@ import {
 import { Skeleton } from '../../components/ui/Skeleton';
 import { toast } from 'react-hot-toast';
 import { useAuth } from '../../hooks/useAuth';
+import { useGuestStore } from '../../store/guestStore';
+import { QuizModal } from '../../components/quiz/QuizModal';
 
 // ── YouTube URL → embed URL ────────────────────────────────────
 function getEmbedUrl(url) {
   if (!url) return null;
+
   const ytMatch = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([\w-]{11})/);
   if (ytMatch) {
     const params = new URLSearchParams({
@@ -31,6 +34,7 @@ function getYoutubeThumbnail(url) {
   if (!url) return null;
   const ytMatch = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([\w-]{11})/);
   if (ytMatch) return `https://i.ytimg.com/vi/${ytMatch[1]}/mqdefault.jpg`;
+  if (url.includes('youtube.com/results')) return 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=400&auto=format&fit=crop&q=60';
   return null;
 }
 
@@ -49,7 +53,9 @@ export default function RoadmapDetailPage() {
 
   const [activeLesson, setActiveLesson] = useState(null); // { lesson, resource }
   const [expandedModules, setExpandedModules] = useState({});
-
+  const [activeQuizModule, setActiveQuizModule] = useState(null);
+  const [activeLessonQuiz, setActiveLessonQuiz] = useState(null);
+  
   // Use our full roadmap endpoint that includes modules + lessons + resources
   const { data: roadmapResponse, isLoading } = useQuery({
     queryKey: ['roadmap-full', id],
@@ -81,6 +87,46 @@ export default function RoadmapDetailPage() {
   const activeIndex = activeLesson
     ? allLessons.findIndex(l => l.lesson._id === activeLesson.lesson._id)
     : -1;
+
+  const { data: progressResponse } = useQuery({
+    queryKey: ['progress', id],
+    queryFn: () => import('../../services/enrollmentService').then(m => m.progressService.getRoadmapProgress(id)),
+    enabled: !!user
+  });
+
+  // The backend endpoint `/progress/roadmap/:roadmapId` returns `{ lessons: Number, progress: [...] }`
+  const enrolledData = progressResponse?.data?.data;
+  const progressDocs = enrolledData?.progress || [];
+  const completedSet = new Set(
+    progressDocs.filter(p => p.completed).map(p => p.lesson_id)
+  );
+  const isCompleted = activeLesson ? completedSet.has(activeLesson.lesson._id) : false;
+
+  const markCompleteMutation = useMutation({
+    mutationFn: (lessonId) => import('../../services/enrollmentService').then(m => m.progressService.markLesson(lessonId)),
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries(['progress', id]);
+      
+      const currentModule = activeLesson.module;
+      const moduleLessonIds = currentModule.lessons.map(l => l._id);
+      
+      // Popup lesson quiz
+      setTimeout(() => setActiveLessonQuiz(activeLesson.lesson), 300);
+
+      // We manually add it here to check completion without waiting for refetch
+      const tempCompleted = new Set(completedSet);
+      tempCompleted.add(variables);
+      const isModuleComplete = moduleLessonIds.every(lid => tempCompleted.has(lid));
+      
+      if (isModuleComplete) {
+        setTimeout(() => setActiveQuizModule(currentModule), 800);
+      }
+    }
+  });
+
+  const handleMarkAsComplete = (lessonId) => {
+    markCompleteMutation.mutate(lessonId);
+  };
 
   const goTo = (idx) => {
     if (idx >= 0 && idx < allLessons.length) {
@@ -158,7 +204,7 @@ export default function RoadmapDetailPage() {
                   <div className="w-20 h-20 rounded-full bg-white/10 flex items-center justify-center mb-4">
                     <Play className="w-10 h-10 text-white/60 ml-1" />
                   </div>
-                  <p className="text-white/50 text-sm">
+                  <p className="text-white/50 text-sm mb-4">
                     {activeLesson ? 'No video for this lesson' : 'Select a lesson to start'}
                   </p>
                 </div>
@@ -187,12 +233,29 @@ export default function RoadmapDetailPage() {
             </div>
 
             {/* Lesson title & meta */}
-            <div className="mt-4">
-              <h1 className="text-xl font-semibold text-white leading-snug">
-                {activeLesson?.lesson?.title || roadmap.title}
-              </h1>
-              {activeLesson?.lesson?.description && (
-                <p className="text-sm text-white/50 mt-1">{activeLesson.lesson.description}</p>
+            <div className="mt-4 flex items-start justify-between gap-4">
+              <div>
+                <h1 className="text-xl font-semibold text-white leading-snug">
+                  {activeLesson?.lesson?.title || roadmap.title}
+                </h1>
+                {activeLesson?.lesson?.description && (
+                  <p className="text-sm text-white/50 mt-1">{activeLesson.lesson.description}</p>
+                )}
+              </div>
+              
+              {activeLesson && user && (
+                <button
+                  onClick={() => handleMarkAsComplete(activeLesson.lesson._id)}
+                  disabled={isCompleted || markCompleteMutation.isPending}
+                  className={`px-4 py-2 shrink-0 rounded-lg font-medium text-sm flex items-center gap-2 transition-colors ${
+                    isCompleted 
+                      ? 'bg-green-500/20 text-green-400 border border-green-500/30 cursor-default'
+                      : 'bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-500/20'
+                  }`}
+                >
+                  <CheckCircle2 className="w-4 h-4" />
+                  {isCompleted ? 'Completed' : (markCompleteMutation.isPending ? 'Saving...' : 'Mark as Complete')}
+                </button>
               )}
             </div>
 
@@ -299,12 +362,14 @@ export default function RoadmapDetailPage() {
                                       : 'hover:bg-white/5'
                                     }`}
                                 >
-                                  {/* Playing Indicator */}
-                                  <div className="w-4 flex justify-center shrink-0 mt-3">
+                                  {/* Playing Indicator & Completed */}
+                                  <div className="w-4 flex justify-center shrink-0 mt-3 relative">
                                     {isActive ? (
                                       <Play className="w-3 h-3 text-white" fill="currentColor" />
                                     ) : (
-                                      <span className="text-[10px] text-white/40 group-hover:hidden">{globalIdx + 1}</span>
+                                      <span className="text-[10px] text-white/40 group-hover:hidden">
+                                        {completedSet.has(lesson._id) ? <Check className="w-3 h-3 text-green-500" /> : globalIdx + 1}
+                                      </span>
                                     )}
                                     {!isActive && <Play className="w-3 h-3 text-white hidden group-hover:block" fill="currentColor" />}
                                   </div>
@@ -320,7 +385,7 @@ export default function RoadmapDetailPage() {
                                       />
                                     ) : (
                                       <div className="w-full h-full flex items-center justify-center bg-white/5">
-                                        <BookOpen className="w-5 h-5 text-white/30" />
+                                        {videoResource ? <Play className="w-5 h-5 text-white/30" /> : <BookOpen className="w-5 h-5 text-white/30" />}
                                       </div>
                                     )}
                                     {/* Estimated Time Overlay */}
@@ -343,6 +408,27 @@ export default function RoadmapDetailPage() {
                                 </button>
                               );
                             })}
+
+                            {/* Quiz Button for Module */}
+                            <div className="px-3 py-2 mt-1">
+                              {(() => {
+                                const isModuleComplete = lessons.length > 0 && lessons.every(l => completedSet.has(l._id));
+                                return (
+                                  <button
+                                    onClick={() => setActiveQuizModule(mod)}
+                                    disabled={!isModuleComplete}
+                                    className={`w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg transition-colors text-sm font-medium ${
+                                      isModuleComplete
+                                        ? 'bg-blue-600/20 text-blue-400 border border-blue-500/30 hover:bg-blue-600 hover:text-white'
+                                        : 'bg-white/5 text-white/30 cursor-not-allowed border border-white/5'
+                                    }`}
+                                  >
+                                    <CheckCircle2 className="w-4 h-4" /> 
+                                    {isModuleComplete ? 'Take Module Quiz' : 'Complete lessons to take Quiz'}
+                                  </button>
+                                );
+                              })()}
+                            </div>
                           </div>
                         )}
                       </div>
@@ -354,6 +440,67 @@ export default function RoadmapDetailPage() {
           </div>
         </div>
       </div>
+
+      <QuizModal
+        isOpen={!!activeQuizModule}
+        onClose={() => setActiveQuizModule(null)}
+        quizData={activeQuizModule ? {
+          quiz: {
+            _id: `mock-quiz-${activeQuizModule._id}`,
+            title: `${activeQuizModule.title} Quiz`,
+            passing_score: 50,
+            isMock: true
+          },
+          questions: [
+            {
+              _id: 'q1',
+              question: `What is the primary use case of the technologies discussed in ${activeQuizModule.title}?`,
+              option_a: 'To style user interfaces',
+              option_b: 'To process data on the server',
+              option_c: 'Depends on the specific technology used in this module',
+              option_d: 'To manage database records',
+            },
+            {
+              _id: 'q2',
+              question: `Which of the following is a best practice when working with the concepts from ${activeQuizModule.title}?`,
+              option_a: 'Ignoring error handling',
+              option_b: 'Writing modular and reusable code',
+              option_c: 'Putting all logic in one file',
+              option_d: 'Avoiding version control',
+            }
+          ]
+        } : null}
+      />
+
+      <QuizModal
+        isOpen={!!activeLessonQuiz}
+        onClose={() => setActiveLessonQuiz(null)}
+        onSuccess={() => {
+          setActiveLessonQuiz(null);
+          // Optionally go to next lesson automatically when quiz passed
+          if (activeIndex >= 0 && activeIndex < totalLessons - 1) {
+            goTo(activeIndex + 1);
+          }
+        }}
+        quizData={activeLessonQuiz ? {
+          quiz: {
+            _id: `mock-lesson-quiz-${activeLessonQuiz._id}`,
+            title: `Quiz: ${activeLessonQuiz.title}`,
+            passing_score: 50,
+            isMock: true
+          },
+          questions: [
+            {
+              _id: 'q1',
+              question: `What did you learn from the lesson: "${activeLessonQuiz.title}"?`,
+              option_a: 'I grasped the main concepts and tools.',
+              option_b: 'It was somewhat confusing.',
+              option_c: 'I need to watch it again.',
+              option_d: 'None of the above.',
+            }
+          ]
+        } : null}
+      />
     </div>
   );
 }
