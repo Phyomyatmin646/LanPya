@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { LockKeyhole, ArrowRight, PlayCircle } from 'lucide-react';
 import './LandingPage.css';
 
 // Import assets from your frontend/assets folder
@@ -19,6 +20,15 @@ const categories = [
   "Media & Communication",
   "Agriculture & Environment",
   "Sports & Fitness"
+];
+
+const courses = [
+  { title: 'Adobe Photoshop', subtitle: 'Beginner Photoshop', image: '/courses/adobe photoshop.png' },
+  { title: 'Typography', subtitle: 'Design Story', image: '/courses/typography.png' },
+  { title: 'Color Theory', subtitle: 'Design Story', image: '/courses/color theory.png' },
+  { title: 'Adobe Illustrator', subtitle: 'Design Story', image: '/courses/adobe illustrator.png' },
+  { title: 'Logo & Branding', subtitle: 'Design Story', image: '/courses/branding.png' },
+  { title: 'Build Your Portfolio', subtitle: 'Design Story', image: '/courses/portfolio.png' },
 ];
 
 export default function LandingPage() {
@@ -45,25 +55,13 @@ export default function LandingPage() {
       <nav className="landing-navbar">
         <div className="nav-container">
           <div className="nav-left">
-            <div className="logo-icon">
-              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" fill="url(#violet-grad)" stroke="url(#violet-grad)" strokeWidth="2" strokeLinejoin="round" />
-                <defs>
-                  <linearGradient id="violet-grad" x1="3" y1="2" x2="21" y2="22" gradientUnits="userSpaceOnUse">
-                    <stop stopColor="#9333ea" />
-                    <stop offset="1" stopColor="#6366f1" />
-                  </linearGradient>
-                </defs>
-              </svg>
-            </div>
-            <span className="wordmark">လမ်းပြ</span>
+            <img src="/LanPya_logo.png" alt="LanPya" className="landing-logo" />
           </div>
 
           <div className="nav-center">
-            <a href="#">Home</a>
-            <a href="#">Courses</a>
-            <a href="#">Roadmaps</a>
-            <a href="#">About</a>
+            <a href="#home">Home</a>
+            <a href="#courses">Courses</a>
+            <Link to="/assessment">Roadmaps</Link>
           </div>
 
           <div className="nav-right">
@@ -78,7 +76,7 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero Section */}
-      <header className="hero">
+      <header id="home" className="hero">
         <div className="hero-content">
           <h1>Digital ခေတ်ထဲလမ်းပျောက်နေလား</h1>
           <p className="subheading">ဝါသနာတွေကနေဝင်ငွေလမ်းကြောင်းဖော်ဆောင်ပေးမယ့် လမ်းပြ</p>
@@ -276,6 +274,37 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Course cards */}
+      <section id="courses" className="course-showcase">
+        <div className="course-showcase-inner">
+          <div className="course-showcase-heading">
+            <span className="course-eyebrow">CURATED LEARNING</span>
+            <h2>Learn skills that move you forward</h2>
+            <p>စိတ်ဝင်စားတဲ့ Course ကိုရွေးပြီး သင့်အတွက်သင့်တော်တဲ့ Roadmap ကိုရှာဖွေလိုက်ပါ။</p>
+          </div>
+          <div className="course-grid">
+            {courses.map((course) => (
+              <Link to="/assessment" key={course.title} className="course-card">
+                <div className="course-card-image">
+                  <img src={course.image} alt={course.title} />
+                  <span className="course-lock"><LockKeyhole size={14} /> Locked</span>
+                  <span className="course-dots"><i /><i /><i /></span>
+                </div>
+                <div className="course-card-body">
+                  <h3>{course.title}</h3>
+                  <p>{course.subtitle}</p>
+                  <div className="course-card-footer">
+                    <span><PlayCircle size={15} /> Course preview</span>
+                    <ArrowRight size={17} />
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+          <Link to="/assessment" className="course-roadmap-link">Find your roadmap <ArrowRight size={17} /></Link>
+        </div>
+      </section>
+
       {/* Explore Section */}
       <section className="explore">
         <div className="explore-header">
@@ -312,18 +341,7 @@ export default function LandingPage() {
             {/* Col 1: About */}
             <div className="space-y-3">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8">
-                  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" fill="url(#violet-grad-footer)" stroke="url(#violet-grad-footer)" strokeWidth="2" strokeLinejoin="round" />
-                    <defs>
-                      <linearGradient id="violet-grad-footer" x1="3" y1="2" x2="21" y2="22" gradientUnits="userSpaceOnUse">
-                        <stop stopColor="#9333ea" />
-                        <stop offset="1" stopColor="#6366f1" />
-                      </linearGradient>
-                    </defs>
-                  </svg>
-                </div>
-                <span className="text-xl font-bold text-white tracking-wider">လမ်းပြ</span>
+                <img src="/LanPya_logo.png" alt="LanPya" className="footer-logo" />
               </div>
               <p className="text-sm text-[#a8a3c4] leading-relaxed">
                 သင်နဲ့ အကိုက်ညီဆုံး Digital Career လမ်းကြောင်း (Roadmap) ကို အလိုအလျောက် ရေးဆွဲပေးပြီး လက်တွေ့လေ့ကျင့်ပေးနိုင်မယ့် Agentic AI ပလက်ဖောင်း။
@@ -337,7 +355,6 @@ export default function LandingPage() {
                 <li><a href="#" className="text-sm text-[#a8a3c4] hover:text-purple-400 transition-colors">Home</a></li>
                 <li><a href="#" className="text-sm text-[#a8a3c4] hover:text-purple-400 transition-colors">Courses</a></li>
                 <li><a href="#" className="text-sm text-[#a8a3c4] hover:text-purple-400 transition-colors">Roadmaps</a></li>
-                <li><a href="#" className="text-sm text-[#a8a3c4] hover:text-purple-400 transition-colors">About</a></li>
               </ul>
             </div>
 
