@@ -131,16 +131,46 @@ export default function ChatComponent() {
       
       if (!res.ok) throw new Error("Failed to connect");
 
+      if (!res.body) throw new Error('AI stream is unavailable');
+
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
       let aiFullResponse = "";
+      let eventBuffer = "";
+
+      const consumeEvent = (event) => {
+        const dataLine = event.split('\n').find(line => line.startsWith('data:'));
+        if (!dataLine) return;
+
+        const dataStr = dataLine.replace(/^data:\s?/, '').trim();
+        if (!dataStr) return;
+
+        try {
+          const data = JSON.parse(dataStr);
+          if (data.error) {
+            throw new Error(data.error);
+          }
+          if (data.done && data.chat) {
+            setMessages(prev => prev.map(m => m.id === aiMessageId ? { ...m, id: data.chat._id } : m));
+            if (data.title) {
+              setSessions(prev => prev.map(s => s._id === activeSessionId ? { ...s, title: data.title } : s));
+            }
+          } else if (data.content) {
+            aiFullResponse += data.content;
+            setMessages(prev => prev.map(m => m.id === aiMessageId ? { ...m, content: aiFullResponse } : m));
+          }
+        } catch (parseError) {
+          throw parseError;
+        }
+      };
 
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
 
-        const chunkStr = decoder.decode(value, { stream: true });
-        const lines = chunkStr.split('\n');
+        eventBuffer += decoder.decode(value, { stream: true });
+        const events = eventBuffer.split('\n\n');
+        eventBuffer = events.pop() || '';
 
         for (const line of lines) {
           if (line.startsWith('data: ')) {
@@ -164,11 +194,16 @@ export default function ChatComponent() {
               // ignore partial parse errors
             }
           }
+        for (const event of events) {
+          consumeEvent(event);
         }
       }
+
+      eventBuffer += decoder.decode();
+      if (eventBuffer.trim()) consumeEvent(eventBuffer);
     } catch (error) {
-      toast.error("Error sending message");
-      setMessages(prev => prev.map(m => m.id === aiMessageId ? { ...m, content: "Sorry, I encountered an error. Please try again." } : m));
+      toast.error(error.message || "Error sending message");
+      setMessages(prev => prev.map(m => m.id === aiMessageId ? { ...m, content: `Sorry, I encountered an error: ${error.message || 'Please try again.'}` } : m));
     } finally {
       setIsLoading(false);
     }
