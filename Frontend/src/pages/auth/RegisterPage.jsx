@@ -48,55 +48,55 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-[#F6F8FA]">
+    <div className="auth-page min-h-screen flex flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="w-full max-w-sm">
         
         <div className="text-center mb-6">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[#24292F] text-white text-2xl font-bold mb-4">
-            L
+          <div className="auth-logo inline-flex items-center justify-center w-12 h-12 rounded-2xl text-white text-2xl font-bold mb-4">
+            ⚡
           </div>
-          <h2 className="text-2xl tracking-tight text-[#24292F]">Create your account</h2>
+          <h2 className="text-2xl tracking-tight text-white">Create your account</h2>
         </div>
 
         {generatedRoadmap && (
-          <div className="mb-4 p-3 bg-[#E5F6EB] text-[#1A7F37] border border-[#2DA44E]/30 rounded-md text-sm font-medium text-center shadow-sm">
+          <div className="auth-notice mb-4 p-3 rounded-xl text-sm font-medium text-center">
             You're just one step away from saving your personalized roadmap!
           </div>
         )}
 
-        <div className="gh-box p-4 mb-4">
+        <div className="auth-card p-5 mb-4">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div>
               <label className="gh-label" htmlFor="full_name">Full Name</label>
-              <input id="full_name" type="text" {...register('full_name')} className="gh-input" />
+              <input id="full_name" type="text" {...register('full_name')} className="auth-input" />
               {errors.full_name && <p className="text-[#CF222E] text-xs mt-1 font-medium">{errors.full_name.message}</p>}
             </div>
 
             <div>
               <label className="gh-label" htmlFor="username">Username</label>
-              <input id="username" type="text" {...register('username')} className="gh-input" />
+              <input id="username" type="text" {...register('username')} className="auth-input" />
               {errors.username && <p className="text-[#CF222E] text-xs mt-1 font-medium">{errors.username.message}</p>}
             </div>
 
             <div>
               <label className="gh-label" htmlFor="email">Email address</label>
-              <input id="email" type="email" {...register('email')} className="gh-input" />
+              <input id="email" type="email" {...register('email')} className="auth-input" />
               {errors.email && <p className="text-[#CF222E] text-xs mt-1 font-medium">{errors.email.message}</p>}
             </div>
 
             <div>
               <label className="gh-label" htmlFor="password">Password</label>
-              <input id="password" type="password" {...register('password')} className="gh-input" />
+              <input id="password" type="password" {...register('password')} className="auth-input" />
               {errors.password && <p className="text-[#CF222E] text-xs mt-1 font-medium">{errors.password.message}</p>}
             </div>
 
-            <button type="submit" disabled={isLoading} className="btn btn-primary w-full mt-2">
+            <button type="submit" disabled={isLoading} className="auth-submit w-full mt-2">
               {isLoading ? 'Creating account...' : 'Sign up for LanPya'}
             </button>
           </form>
         </div>
 
-        <p className="text-center text-sm text-[#24292F] gh-box p-4 bg-white">
+        <p className="auth-card text-center text-sm p-4">
           Already have an account?{' '}
           <Link to="/login" className="text-accent hover:underline font-medium">
             Sign in

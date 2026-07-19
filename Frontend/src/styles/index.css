@@ -191,6 +191,39 @@
   .gh-link-muted {
     @apply text-[#57606A] hover:text-accent transition-colors;
   }
+
+  .auth-page {
+    background:
+      radial-gradient(circle at 50% 25%, rgba(113, 48, 220, .18), transparent 34%),
+      linear-gradient(135deg, #070414 0%, #100727 52%, #080514 100%);
+    color: #fff;
+  }
+
+  .auth-logo {
+    background: linear-gradient(135deg, #7829f4, #a85cff);
+    box-shadow: 0 0 28px rgba(145, 73, 255, .38);
+  }
+
+  .auth-card {
+    @apply rounded-2xl border border-[#38286b] bg-[#100a2b]/90 text-white;
+    box-shadow: 0 18px 45px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.04);
+  }
+
+  .auth-input {
+    @apply w-full rounded-lg border border-[#493681] bg-[#09051d] px-3 py-2.5 text-sm text-white outline-none transition;
+  }
+
+  .auth-input::placeholder { color: rgba(255,255,255,.35); }
+  .auth-input:focus { @apply border-[#a05cff] ring-2 ring-[#8a43f5]/25; }
+
+  .auth-submit {
+    @apply inline-flex items-center justify-center rounded-full border border-white/90 bg-gradient-to-r from-[#8e32ed] to-[#6255ef] px-4 py-2.5 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60;
+    box-shadow: 0 8px 22px rgba(120,47,237,.28);
+  }
+
+  .auth-notice {
+    @apply border border-[#7a45e8]/35 bg-[#2b175e]/60 text-[#d9c4ff];
+  }
 }
 
 /* Custom Scrollbar */

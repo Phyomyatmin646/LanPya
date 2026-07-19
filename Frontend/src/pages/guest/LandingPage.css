@@ -94,6 +94,20 @@
   gap: 12px;
 }
 
+.landing-logo {
+  display: block;
+  width: 128px;
+  height: 52px;
+  object-fit: contain;
+}
+
+.footer-logo {
+  display: block;
+  width: 128px;
+  height: 52px;
+  object-fit: contain;
+}
+
 .logo-icon {
   width: 32px;
   height: 32px;
@@ -150,6 +164,7 @@
   background: var(--gradient-primary);
   padding: 12px 24px;
   color: white;
+  border: 1px solid rgba(255,255,255,.95);
 }
 
 .btn-primary:hover {
@@ -524,6 +539,154 @@
   font-family: 'Walone', 'Irrawaddy', 'Inter', sans-serif;
 }
 
+/* Course preview cards */
+.course-showcase {
+  position: relative;
+  z-index: 10;
+  padding: 88px 24px;
+  background: #080713;
+  border-top: 1px solid rgba(255,255,255,.06);
+  border-bottom: 1px solid rgba(255,255,255,.06);
+}
+
+.course-showcase-inner {
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+.course-showcase-heading {
+  text-align: center;
+  margin: 0 auto 36px;
+}
+
+.course-eyebrow {
+  display: inline-block;
+  margin-bottom: 12px;
+  color: #a66aff;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .18em;
+}
+
+.course-showcase-heading h2 {
+  margin: 0 0 10px;
+  font-size: clamp(28px, 4vw, 42px);
+  line-height: 1.15;
+  color: #fff;
+}
+
+.course-showcase-heading p {
+  margin: 0 auto;
+  max-width: 620px;
+  color: #aaa6c5;
+  font-size: 15px;
+}
+
+.course-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.course-card {
+  overflow: hidden;
+  border: 1px solid #30265b;
+  border-radius: 18px;
+  background: linear-gradient(180deg, #130c35 0%, #0d0923 100%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.04), 0 12px 28px rgba(0,0,0,.18);
+  transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+}
+
+.course-card:hover {
+  transform: translateY(-5px);
+  border-color: #8c4dff;
+  box-shadow: 0 14px 30px rgba(117,48,220,.25);
+}
+
+.course-card-image {
+  position: relative;
+  height: 190px;
+  overflow: hidden;
+  background: #160b3d;
+}
+
+.course-card-image::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(8,3,25,.12), rgba(8,3,25,.88));
+}
+
+.course-card-image img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  filter: saturate(.85) brightness(.8);
+  transition: transform .4s ease;
+}
+
+.course-card:hover .course-card-image img { transform: scale(1.06); }
+
+.course-lock {
+  position: absolute;
+  z-index: 2;
+  top: 14px;
+  left: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 9px;
+  border: 1px solid rgba(185,132,255,.45);
+  border-radius: 999px;
+  background: rgba(35,15,78,.82);
+  color: #e6d9ff;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.course-dots {
+  position: absolute;
+  z-index: 2;
+  top: 17px;
+  right: 16px;
+  display: flex;
+  gap: 5px;
+}
+
+.course-dots i { width: 8px; height: 8px; border-radius: 50%; background: #963fff; box-shadow: 0 0 8px #963fff; }
+
+.course-card-body { padding: 18px; }
+.course-card-body h3 { margin: 0 0 5px; color: #fff; font-size: 18px; line-height: 1.2; }
+.course-card-body p { margin: 0 0 16px; color: #a66aff; font-size: 12px; }
+
+.course-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 13px;
+  border-top: 1px solid rgba(255,255,255,.1);
+  color: #aaa6c5;
+  font-size: 11px;
+}
+
+.course-card-footer span { display: inline-flex; align-items: center; gap: 6px; }
+.course-card-footer svg:last-child { color: #a765ff; }
+
+.course-roadmap-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: fit-content;
+  margin: 32px auto 0;
+  color: #b477ff;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.course-roadmap-link:hover { color: #fff; }
+
 .btn-unlock {
   background: white;
   color: black;
@@ -602,6 +765,8 @@
   .video-grid {
     grid-template-columns: repeat(2, 1fr);
   }
+
+  .course-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 @media (max-width: 380px) {
@@ -618,6 +783,8 @@
   .video-grid {
     grid-template-columns: 1fr;
   }
+
+  .course-grid { grid-template-columns: 1fr; }
 
   .accordion-title {
     font-size: 16px;

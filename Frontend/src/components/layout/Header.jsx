@@ -25,7 +25,7 @@ export function Header({ toggleSidebar }) {
           <img
             src="/LanPya_logo.png"
             alt="LanPya Logo"
-            className="w-11 h-11 object-contain"
+            className="w-[118px] h-12 object-contain"
           />
         </Link>
 
