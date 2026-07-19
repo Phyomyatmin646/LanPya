@@ -464,23 +464,23 @@ const COURSES_DATA = [
     lessons: [
       {
         title: "how to run MongoDB on a custom local host",
-        youtubeUrl: "https://www.youtube.com/watch?v=QY8PA-LJPnU"
+        youtubeUrl: "https://www.youtube.com/embed/QY8PA-LJPnU?si=KrtLIFIhrl8_xkIm"
       },
       {
         title: "Enable authorization and add user & password in MongoDB",
-        youtubeUrl: "https://www.youtube.com/watch?v=FtNIfaa4Icc"
+        youtubeUrl: "https://www.youtube.com/embed/FtNIfaa4Icc?si=-eRzT-eB9bORspqO"
       },
       {
         title: "Sing-in & Sing-up System using Tkinter GUI and MongoDB Database",
-        youtubeUrl: "https://www.youtube.com/watch?v=BrqtKM_L3v8"
+        youtubeUrl: "https://www.youtube.com/embed/BrqtKM_L3v8?si=gUgRgbkavPO8bYh7"
       },
       {
         title: "CRUD Operations in MongoDB",
-        youtubeUrl: "https://www.youtube.com/watch?v=812b6zLtZL8"
+        youtubeUrl: "https://www.youtube.com/embed/812b6zLtZL8?si=DtqOc-GPG1Bq8KM_"
       },
       {
         title: "Update & Delete Operator in MongoDB",
-        youtubeUrl: "https://www.youtube.com/watch?v=Lo4Bj38Zkb8"
+        youtubeUrl: "https://www.youtube.com/embed/Lo4Bj38Zkb8?si=aMD-U8yr1LM5OQzY"
       }
     ]
   },
@@ -662,23 +662,23 @@ const COURSES_DATA = [
     lessons: [
       {
         title: "Microsoft Excel အပိုင်း ၁",
-        youtubeUrl: "https://www.youtube.com/watch?v=fJ7-euukaSQ"
+        youtubeUrl: "https://www.youtube.com/embed/fJ7-euukaSQ?si=vSipcUkLte2PfW_7"
       },
       {
         title: "Microsoft Excel အပိုင်း ၂",
-        youtubeUrl: "https://www.youtube.com/watch?v=PkIAwO93iFY"
+        youtubeUrl: "https://www.youtube.com/embed/PkIAwO93iFY?si=5bRu93lgt_CId3pR"
       },
       {
         title: "Microsoft Excel အပိုင်း ၃",
-        youtubeUrl: "https://www.youtube.com/watch?v=f6CnV3yb5iw"
+        youtubeUrl: "https://www.youtube.com/embed/f6CnV3yb5iw?si=OpVL5ZhNRqkIgERK"
       },
       {
         title: "Microsoft Excel အပိုင်း ၄",
-        youtubeUrl: "https://www.youtube.com/watch?v=aIcm5I_tA9w"
+        youtubeUrl: "https://www.youtube.com/embed/aIcm5I_tA9w?si=swxtkHow9gQipJkR"
       },
       {
         title: "Microsoft Excel အပိုင်း ၅",
-        youtubeUrl: "https://www.youtube.com/watch?v=efdBzdYAmno"
+        youtubeUrl: "https://www.youtube.com/embed/efdBzdYAmno?si=IiQMvGo9g0hn_seL"
       },
       {
         title: "How To Use Formulas In Microsoft Excel | Formula မျာ အသုံးပြုနည်း",
@@ -686,7 +686,7 @@ const COURSES_DATA = [
       },
       {
         title: "How To Use Formulas In Microsoft Excel | Formula များအသုံးပြုနည်း",
-        youtubeUrl: ""
+        youtubeUrl: "https://www.youtube.com/embed/_2ej9bLc0hQ?si=CPLewJJSsDpWpKa7"
       }
     ]
   },
@@ -976,15 +976,15 @@ const COURSES_DATA = [
     lessons: [
       {
         title: "Best way to learn Agentic AI",
-        youtubeUrl: ""
+        youtubeUrl: "https://www.youtube.com/embed/9dqG63VE0zw?si=I6RI-od4EUiGenJ0"
       },
       {
         title: "Telegram Bot and n8n ချိတ်ဆက် ၊ AI Agents များကို Telegram ကနေ ခိုင်းစေခြင်း | Agentic AI Myanmar",
-        youtubeUrl: ""
+        youtubeUrl: "https://www.youtube.com/embed/yFTCS_F5gJM?si=03O0rmqR8s_jPRZa"
       },
       {
         title: "Agentic AI: အနာဂတ်ရဲ့ ဦးဆောင်သူ? (Agentic AI: The Future Leader?)",
-        youtubeUrl: ""
+        youtubeUrl: "https://www.youtube.com/embed/XTsHMJdsz98?si=GjvgqsMqsj1pf5hx"
       }
     ]
   },
@@ -994,23 +994,23 @@ const COURSES_DATA = [
     lessons: [
       {
         title: "What is AI?",
-        youtubeUrl: ""
+        youtubeUrl: "https://www.youtube.com/embed/VuTzIX1LrS0?si=E20KYkEp_igjCNjZ"
       },
       {
         title: "chat gpt အသုံးပြုနည်း",
-        youtubeUrl: ""
+        youtubeUrl: "https://www.youtube.com/embed/k2iby-qWxMg?si=geXqwHoXDHuTtXzY"
       },
       {
         title: "ChatGPT x Canva တွဲသုံးနည်း",
-        youtubeUrl: ""
+        youtubeUrl: "https://www.youtube.com/embed/VKL1Wfatg_Q?si=LpAnHatsc-uC46qA"
       },
       {
         title: "AI သုံးပြီး Assignment ဘယ်လိုရေးမလည်း",
-        youtubeUrl: ""
+        youtubeUrl: "https://www.youtube.com/embed/fwmeIkBT0dY?si=m7nTvNxxE4LYIVp9"
       },
       {
         title: "ကျွန်တော်ငတတ်ပြားဂိမ်းကို Chatgpt Ai ကိုရေးခိုင်းခဲ့တယ်",
-        youtubeUrl: ""
+        youtubeUrl: "https://www.youtube.com/embed/ki1iVw_cMFw?si=RHJwFvu0rQhYPIBn"
       }
     ]
   },
@@ -1020,15 +1020,15 @@ const COURSES_DATA = [
     lessons: [
       {
         title: "လူတိုင်း အတွက် AI ကို ခိုင်းနည်း။ (AI Prompting)",
-        youtubeUrl: ""
+        youtubeUrl: "https://www.youtube.com/embed/4sBlFd5FaoQ?si=yKPimNgBd_DjmiZu"
       },
       {
         title: "Prompt Engineering 1",
-        youtubeUrl: ""
+        youtubeUrl: "https://www.youtube.com/embed/pEJlL7RHy9w?si=tAS_4RtxttJge2VF"
       },
       {
         title: "Prompt Engineering 2",
-        youtubeUrl: ""
+        youtubeUrl: "https://www.youtube.com/embed/5x1DUXmsIbU?si=_i-dsAhceGnDefpW"
       }
     ]
   },
@@ -1038,15 +1038,15 @@ const COURSES_DATA = [
     lessons: [
       {
         title: "AI ကို အလွယ်ကူဆုံး လေ့လာမယ် (ChatGPT, Claude, Deepseek) ဘာတွေကွာလဲ?",
-        youtubeUrl: ""
+        youtubeUrl: "https://www.youtube.com/embed/V2OyrPxeCXA?si=9bXFL3spWlvVfvQs"
       },
       {
         title: "AI သုံးပြီး ဝင်ငွေရှာ/ လုပ်ငန်းတစ်ခုစတင် ခြင်း",
-        youtubeUrl: ""
+        youtubeUrl: "https://www.youtube.com/embed/ck2CU9s_cxw?si=pM6nYaw6bIIJST2t"
       },
       {
         title: "Gemini enterprise နဲ့ AI video တွေကို free ထုတ်လို့ရနေပြီ | How to generate AI videos for free",
-        youtubeUrl: ""
+        youtubeUrl: "https://www.youtube.com/embed/tDL32SgWOEU?si=YVFd-SM5JCzWQAHW"
       }
     ]
   },
@@ -1056,41 +1056,41 @@ const COURSES_DATA = [
     lessons: [
       {
         title: "PowerBI Dashboard Design ဆွဲတဲ့အခါမှာ မဖြစ်နေ သိရမယ့် အချက် ၁၃ ချက်",
-        youtubeUrl: ""
+        youtubeUrl: "https://www.youtube.com/embed/7AoeZRT2TDE?si=OEYVt_qleUdnALee"
       },
       {
         title: "PowerBI Reports တွေမှာ Toggle Button အသုံးပြုပြီး Theme Design style change နည်း",
-        youtubeUrl: ""
+        youtubeUrl: "https://www.youtube.com/embed/eQlJeAkJsQ4?si=IHMkVOX_sDZ97CD3"
       },
       {
         title: "Making bar and line charts in PoweBI",
-        youtubeUrl: ""
+        youtubeUrl: "https://www.youtube.com/embed/KbHgAi9Bjmk?si=CFST7A6a0c97SH9t"
       },
       {
         title: "Making Pie Chart, Treemap, Slice in  PowerBI",
-        youtubeUrl: ""
+        youtubeUrl: "https://www.youtube.com/embed/m-SV7z4Y_-g?si=m4xVDTbYdZYA_ys-"
       }
     ]
   },
   {
-    title: "PowerBI",
-    skillName: "PowerBI",
+    title: "Power BI",
+    skillName: "Power BI",
     lessons: [
       {
         title: "Beginner Guide to Power BI - Part 1",
-        youtubeUrl: ""
+        youtubeUrl: "https://www.youtube.com/embed/RMx8GZ3VGew?si=55Rq15odb2SNXr4s"
       },
       {
         title: "Beginner Guide to Power BI - Part 2",
-        youtubeUrl: ""
+        youtubeUrl: "https://www.youtube.com/embed/DsYAs8QRXqM?si=BFa9XJ9OET15hZol"
       },
       {
         title: "Building Power BI report from Excel - Part 1",
-        youtubeUrl: ""
+        youtubeUrl: "https://www.youtube.com/embed/ixZyE-sdxjE?si=KBJt8jtYIiIc1I47"
       },
       {
         title: "Building Power BI report from Excel - Part 2",
-        youtubeUrl: ""
+        youtubeUrl: "https://www.youtube.com/embed/ke24LY0BbFA?si=Kt6zR59J-K-d9EmL"
       }
     ]
   },
@@ -1890,7 +1890,59 @@ async function seed() {
 
       // Roadmap: one per skill (upsert-style)
       let roadmap = await Roadmap.findOne({ title: normSkill });
-      const currentThumb = ROADMAP_THUMBNAILS[normSkill.toLowerCase()] || "";
+      
+      const FALLBACK_IMAGES = [
+        'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=400&h=250&fit=crop&q=80',
+        'https://images.unsplash.com/photo-1504639725590-34d0984388bd?w=400&h=250&fit=crop&q=80',
+        'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=400&h=250&fit=crop&q=80',
+        'https://images.unsplash.com/photo-1542831371-29b0f74f9713?w=400&h=250&fit=crop&q=80',
+        'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=400&h=250&fit=crop&q=80',
+        'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=400&h=250&fit=crop&q=80',
+      ];
+      
+      const CARD_IMAGES = {
+        'web':              'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=400&h=250&fit=crop&q=80',
+        'html':             'https://images.unsplash.com/photo-1621839673705-6617adf9e890?w=400&h=250&fit=crop&q=80',
+        'css':              'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=250&fit=crop&q=80',
+        'javascript':       'https://images.unsplash.com/photo-1579468118864-1b9ea3c0db4a?w=400&h=250&fit=crop&q=80',
+        'node':             'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?w=400&h=250&fit=crop&q=80',
+        'laravel':          'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=400&h=250&fit=crop&q=80',
+        'php':              'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=400&h=250&fit=crop&q=80',
+        'database':         'https://images.unsplash.com/photo-1544383835-bda2bc66a55d?w=400&h=250&fit=crop&q=80',
+        'python':           'https://images.unsplash.com/photo-1526379095098-d400fd0bf935?w=400&h=250&fit=crop&q=80',
+        'photoshop':        'https://images.unsplash.com/photo-1609921212029-bb5a28e60960?w=400&h=250&fit=crop&q=80',
+        'design':           'https://images.unsplash.com/photo-1626785774573-4b799315345d?w=400&h=250&fit=crop&q=80',
+        'video':            'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=400&h=250&fit=crop&q=80',
+        'capcut':           'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=400&h=250&fit=crop&q=80',
+        'premiere':         'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=400&h=250&fit=crop&q=80',
+        'davinci':          'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=400&h=250&fit=crop&q=80',
+        'excel':            'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=250&fit=crop&q=80',
+        'word':             'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=400&h=250&fit=crop&q=80',
+        'powerpoint':       'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=250&fit=crop&q=80',
+        'google':           'https://images.unsplash.com/photo-1573804633927-bfcbcd909acd?w=400&h=250&fit=crop&q=80',
+        'computer':         'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=400&h=250&fit=crop&q=80',
+        'internet':         'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=400&h=250&fit=crop&q=80',
+        'marketing':        'https://images.unsplash.com/photo-1533750516457-a7f992034fec?w=400&h=250&fit=crop&q=80',
+        'ai':               'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=400&h=250&fit=crop&q=80',
+        'data':             'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&h=250&fit=crop&q=80',
+        'security':         'https://images.unsplash.com/photo-1563986768494-4dee2763ff3f?w=400&h=250&fit=crop&q=80',
+        'freelanc':         'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=400&h=250&fit=crop&q=80',
+        'hosting':          'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=400&h=250&fit=crop&q=80',
+      };
+      
+      let unsplashThumb = "";
+      for (const [key, img] of Object.entries(CARD_IMAGES)) {
+        if (normSkill.toLowerCase().includes(key)) {
+          unsplashThumb = img;
+          break;
+        }
+      }
+      if (!unsplashThumb) {
+        const hash = [...normSkill].reduce((a, c) => a + c.charCodeAt(0), 0);
+        unsplashThumb = FALLBACK_IMAGES[hash % FALLBACK_IMAGES.length];
+      }
+
+      const currentThumb = ROADMAP_THUMBNAILS[normSkill.toLowerCase()] || unsplashThumb;
       if (!roadmap) {
         roadmap = await Roadmap.create({
           category_id,
@@ -1944,14 +1996,20 @@ async function seed() {
 
         // LessonResource (youtube video)
         const resourceUrl = lData.youtubeUrl || "#";
-        const existingResource = await LessonResource.findOne({ lesson_id: lesson._id, url: resourceUrl });
-        if (!existingResource) {
+        let resource = await LessonResource.findOne({ lesson_id: lesson._id });
+        if (!resource) {
           await LessonResource.create({
             lesson_id: lesson._id,
             title: lessonTitle,
             type: 'video',
             url: resourceUrl,
           });
+        } else {
+          if (resource.url !== resourceUrl) {
+            resource.url = resourceUrl;
+            await resource.save();
+            console.log(`      ~ Updated resource URL to: ${resourceUrl}`);
+          }
         }
       }
     }
