@@ -102,16 +102,31 @@ exports.chatWithAI = async (userMessage, history = [], context = {}, res = null)
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
       
-      let isFirstChunk = true;
+      let buffer = "";
 
       while (true) {
         const { done, value } = await reader.read();
-        if (done) break;
+        if (done) {
+          if (buffer.trim()) {
+            try {
+              const data = JSON.parse(buffer);
+              if (data.message && data.message.content) {
+                fullContent += data.message.content;
+                if (res && toolCalls.length === 0) {
+                  res.write(`data: ${JSON.stringify({ content: data.message.content })}\n\n`);
+                }
+              }
+            } catch(e) {}
+          }
+          break;
+        }
         
-        const chunkStr = decoder.decode(value, { stream: true });
-        const lines = chunkStr.split('\n').filter(line => line.trim() !== '');
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop(); // keep incomplete line in buffer
         
         for (const line of lines) {
+          if (!line.trim()) continue;
           try {
             const data = JSON.parse(line);
             if (data.message) {

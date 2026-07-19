@@ -152,7 +152,7 @@ export default function ChatComponent() {
               if (data.error) {
                 toast.error(data.error);
               } else if (data.done && data.chat) {
-                setMessages(prev => prev.map(m => m.id === aiMessageId ? { ...m, id: data.chat._id } : m));
+                setMessages(prev => prev.map(m => m.id === aiMessageId ? { ...m, id: data.chat._id, content: data.chat.ai_response || aiFullResponse } : m));
                 if (data.title) {
                   setSessions(prev => prev.map(s => s._id === activeSessionId ? { ...s, title: data.title } : s));
                 }

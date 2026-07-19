@@ -52,7 +52,6 @@ export default function App() {
           {/* Guest only routes */}
           <Route element={<PublicRoute />}>
             <Route path="/" element={<LandingPage />} />
-            <Route path="/assessment" element={<AssessmentPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
@@ -61,6 +60,7 @@ export default function App() {
 
           {/* Hybrid routes (Guests + Authenticated Users) */}
           <Route element={<HybridRoute />}>
+            <Route path="/assessment" element={<AssessmentPage />} />
             <Route element={<DashboardLayout />}>
               <Route path="/dashboard"       element={<DashboardPage />} />
               <Route path="/explore"         element={<ExplorePage />} />

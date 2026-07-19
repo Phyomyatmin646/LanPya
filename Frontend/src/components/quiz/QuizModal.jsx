@@ -19,8 +19,15 @@ export const QuizModal = ({ quizData, isOpen, onClose, onSuccess }) => {
   const handleSubmit = async () => {
     setIsSubmitting(true);
     try {
-      const response = await quizService.submitAttempt(quiz._id, answers);
-      const attemptResult = response.data.data;
+      let attemptResult;
+      if (quiz.isMock) {
+        await new Promise(resolve => setTimeout(resolve, 800)); // fake delay
+        // Mock a 100% score for demo
+        attemptResult = { score: 100, passed: true };
+      } else {
+        const response = await quizService.submitAttempt(quiz._id, answers);
+        attemptResult = response.data.data;
+      }
       setResult(attemptResult);
       if (attemptResult.score >= quiz.passing_score) {
         onSuccess(attemptResult);

@@ -105,7 +105,9 @@ exports.generateGuestAssessment = asyncHandler(async (req, res) => {
 
   const systemInstruction = `You are an expert technical learning advisor for the LanPya platform.
 Your task is to recommend exactly 5 learning roadmaps based on the user's top tracked interests and the platform's available roadmaps.
-The first roadmap should be the absolute best match (Top choice), and the remaining 4 should be optional alternative paths representing top careers.
+The first roadmap should be the absolute best match (Top choice) and MUST focus EXACTLY on the user's top track. 
+For example, if the track is "Video Editing", the tech should be "Premiere Pro, DaVinci Resolve", NOT programming or web development.
+The remaining 4 should be optional alternative paths representing top related careers.
 
 Output ONLY valid JSON containing an array of exactly 5 roadmap objects.
 Format:
@@ -144,23 +146,24 @@ Please generate the 5 roadmaps array now.`;
     if (roadmapsArray.length > 5) roadmapsArray = roadmapsArray.slice(0, 5);
   } catch (e) {
     // Fallback if local AI fails or parsing fails
+    const mainTrack = topTracks[0] || "Custom";
     roadmapsArray = [
       {
-        title: `${topTracks[0] || "Custom"} Master Path`,
-        description: "Your personalized top recommendation based on your quiz.",
+        title: `${mainTrack} Master Path`,
+        description: `Your personalized top recommendation based on your interest in ${mainTrack}.`,
         modules: [
-          { name: "Basics", tech: "HTML/CSS, Python or UI Principles" },
-          { name: "Intermediate Concepts", tech: "JS, Git, or Figma" },
-          { name: "Advanced Projects", tech: "Frameworks, Docker, or Prototyping" },
-          { name: "Portfolio", tech: "Build real projects" },
-          { name: "Career Prep", tech: "Interview Prep, Resume" }
+          { name: "Basics", tech: `Introduction to ${mainTrack} tools and concepts` },
+          { name: "Intermediate Concepts", tech: `Core techniques and workflows for ${mainTrack}` },
+          { name: "Advanced Projects", tech: `Advanced skills and complex project building in ${mainTrack}` },
+          { name: "Portfolio", tech: "Build real-world projects for your portfolio" },
+          { name: "Career Prep", tech: "Interview Prep and Resume building" }
         ],
         isTopMatch: true
       },
-      { title: "Alternative Path 1", description: "Optional path", modules: [{name: "Concept 1", tech: "Tech 1"}, {name: "Concept 2", tech: "Tech 2"}, {name: "Concept 3", tech: "Tech 3"}, {name: "Concept 4", tech: "Tech 4"}, {name: "Concept 5", tech: "Tech 5"}], isTopMatch: false },
-      { title: "Alternative Path 2", description: "Optional path", modules: [{name: "Concept 1", tech: "Tech 1"}, {name: "Concept 2", tech: "Tech 2"}, {name: "Concept 3", tech: "Tech 3"}, {name: "Concept 4", tech: "Tech 4"}, {name: "Concept 5", tech: "Tech 5"}], isTopMatch: false },
-      { title: "Alternative Path 3", description: "Optional path", modules: [{name: "Concept 1", tech: "Tech 1"}, {name: "Concept 2", tech: "Tech 2"}, {name: "Concept 3", tech: "Tech 3"}, {name: "Concept 4", tech: "Tech 4"}, {name: "Concept 5", tech: "Tech 5"}], isTopMatch: false },
-      { title: "Alternative Path 4", description: "Optional path", modules: [{name: "Concept 1", tech: "Tech 1"}, {name: "Concept 2", tech: "Tech 2"}, {name: "Concept 3", tech: "Tech 3"}, {name: "Concept 4", tech: "Tech 4"}, {name: "Concept 5", tech: "Tech 5"}], isTopMatch: false }
+      { title: "Alternative Path 1", description: "Optional related path", modules: [{name: "Concept 1", tech: "Tech 1"}], isTopMatch: false },
+      { title: "Alternative Path 2", description: "Optional related path", modules: [{name: "Concept 1", tech: "Tech 1"}], isTopMatch: false },
+      { title: "Alternative Path 3", description: "Optional related path", modules: [{name: "Concept 1", tech: "Tech 1"}], isTopMatch: false },
+      { title: "Alternative Path 4", description: "Optional related path", modules: [{name: "Concept 1", tech: "Tech 1"}], isTopMatch: false }
     ];
   }
 
