@@ -30,6 +30,8 @@
   min-height: 100vh;
 }
 
+.landing-page-container { scroll-behavior: smooth; }
+
 .landing-page-container a {
   text-decoration: none;
   color: inherit;
