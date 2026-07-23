@@ -1207,7 +1207,7 @@ const COURSES_DATA = [
     lessons: [
       {
         title: "Client တွေလိုအပ်မယ့် Design ကောင်း/ System ကောင်းဘယ်လိုဖန်တီးမလဲ?",
-        youtubeUrl: ""
+        youtubeUrl: "https://www.youtube.com/embed/YnUlXL__6Cs?si=RNimPuyF0_rFrknm"
       }
     ]
   },
@@ -1217,19 +1217,19 @@ const COURSES_DATA = [
     lessons: [
       {
         title: "UI/ UX ဆိုတာဘာလဲနှင့် UI အတွက်သုံးသင့်သော Tools များ",
-        youtubeUrl: ""
+        youtubeUrl: "https://www.youtube.com/embed/mo0KGK0ndRA?si=xLLeGAn7edil1X2f"
       },
       {
         title: "UI Design ဘယ်လိုစလေ့ကျင့်ရမလဲ",
-        youtubeUrl: ""
+        youtubeUrl: "https://www.youtube.com/embed/xpA0U8d8AcI?si=z4Y_AkoWiAkm3qQw"
       },
       {
         title: "သူများဆွဲထားတဲ့ UI Design ကိုဘယ်လိုအတုယူရမလဲ",
-        youtubeUrl: ""
+        youtubeUrl: "https://www.youtube.com/embed/uLMJdzE0fXA?si=nMwLzMClVeh72QHj"
       },
       {
         title: "သူများဆွဲထားတဲ့ Web Design အတုယူနည်း (02",
-        youtubeUrl: ""
+        youtubeUrl: "https://www.youtube.com/embed/5R1dQxu0HqM?si=V6Q8BAb1jcL6iG_C"
       }
     ]
   },
@@ -1239,19 +1239,19 @@ const COURSES_DATA = [
     lessons: [
       {
         title: "User-Centred Design ဆိုတာဘာလဲ",
-        youtubeUrl: ""
+        youtubeUrl: "https://www.youtube.com/embed/BPICxdk5k08?si=m_31HGRrw1xvLDzY"
       },
       {
         title: "Cognitive Load in UX",
-        youtubeUrl: ""
+        youtubeUrl: "https://www.youtube.com/embed/6kLUXvPyRqA?si=0iRmqaVU4_zELA_E"
       },
       {
         title: "UX မှာ Tool တွေထက် Thinking က ဘာလို့ ပိုအရေးကြီးတာလဲ",
-        youtubeUrl: ""
+        youtubeUrl: "https://www.youtube.com/embed/8ZtVtG0Ug8s?si=YifkXoZXY1DQhEyl"
       },
       {
         title: "UX Designer တစ်ယောက်လို ဘယ်လိုစဉ်းစားကြမလဲ",
-        youtubeUrl: ""
+        youtubeUrl: "https://www.youtube.com/embed/rTcwvClAEd0?si=s0FVKLx8HBQGkild"
       }
     ]
   },
@@ -1261,23 +1261,23 @@ const COURSES_DATA = [
     lessons: [
       {
         title: "Learning Figma Part 1",
-        youtubeUrl: ""
+        youtubeUrl: "https://www.youtube.com/embed/0uqoVYo0Lvk?si=9JFQkNDN-u6u3ghY"
       },
       {
         title: "Learning Figma Part 2",
-        youtubeUrl: ""
+        youtubeUrl: "https://www.youtube.com/embed/qB2YoIBwYpc?si=P_s0gsjN211d2ift"
       },
       {
         title: "Learning Figma Part 3",
-        youtubeUrl: ""
+        youtubeUrl: "https://www.youtube.com/embed/bQe8bRd1v1Y?si=EcJCLuOAa0_Ypqjs"
       },
       {
         title: "Learning Figma Part 4",
-        youtubeUrl: ""
+        youtubeUrl: "https://www.youtube.com/embed/mtSLjyK5SHo?si=kGclsxENJpXGUB4D"
       },
       {
         title: "Learning Figma Part 5",
-        youtubeUrl: ""
+        youtubeUrl: "https://www.youtube.com/embed/96seNl1Wm-k?si=OQsfjxxVQkycCN_a"
       }
     ]
   },
@@ -1292,15 +1292,15 @@ const COURSES_DATA = [
     lessons: [
       {
         title: "portfolio ကောင်းတစ်ခုကိုဘယ်လိုဖန်တီးမလဲ?",
-        youtubeUrl: ""
+        youtubeUrl: "https://www.youtube.com/embed/Z0Mrqh2Z6Zg?si=J_SWqAQQW31ToHsn"
       },
       {
         title: "Portfolio ဆိုတာ ဘာလဲ? ဘယ်လိုလုပ်ရမလဲ?",
-        youtubeUrl: ""
+        youtubeUrl: "https://www.youtube.com/embed/SRA5qIaNSQw?si=zUoY0-6NH0c4IJmY"
       },
       {
         title: "အလုပ်လျှောက်ဖို့ Portfolio ရှိပြီလား?",
-        youtubeUrl: ""
+        youtubeUrl: "https://www.youtube.com/embed/tWlyB80KCno?si=gunZipOPgY5xPm4L"
       }
     ]
   },
@@ -2005,10 +2005,13 @@ async function seed() {
             url: resourceUrl,
           });
         } else {
-          if (resource.url !== resourceUrl) {
+          // Force update if the stored URL is a search query, '#', or empty
+          const isBadUrl = !resource.url || resource.url === '#' || resource.url.includes('search_query') || resource.url.includes('results?');
+          if (resourceUrl !== '#' && (isBadUrl || resource.url !== resourceUrl)) {
             resource.url = resourceUrl;
+            resource.title = lessonTitle;
             await resource.save();
-            console.log(`      ~ Updated resource URL to: ${resourceUrl}`);
+            console.log(`      ~ Updated resource URL to: ${resourceUrl.substring(0, 60)}`);
           }
         }
       }
